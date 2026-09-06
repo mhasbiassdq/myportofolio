@@ -5,13 +5,13 @@
 }
 
 :root {
-    --ink: #1c1917;
-    --paper: #faf6f0;
-    --accent: #d95d39;
-    --accent-dark: #a8442a;
-    --line: #e3d9c9;
-    --text-muted: #6b6459;
-    --radius: 4px;
+  --ink: #f8fafc;
+  --paper: #0f172a;
+  --accent: #38bdf8;
+  --accent-dark: #0284c7;
+  --line: #334155;
+  --text-muted: #94a3b8;
+  --radius: 8px;
 }
 
 body {
