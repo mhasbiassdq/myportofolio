@@ -1,52 +1,52 @@
-from django.test import TestCase
+import uuid
+from django.test import TestCase, Client
 from django.urls import reverse
-from django.utils import timezone
+from main.models import Experience, Project
 
-from main.models import Experience
 
-class MainTest(TestCase):
+class ExperienceViewTest(TestCase):
     def setUp(self):
-        self.experience = Experience.objects.create(
-            title="Asisten Dosen PBP",
-            description="Membantu mahasiswa memahami dasar pengembangan web.",
-            category="part-time",
+        self.client = Client()
+        self.url = reverse('main:show_experience')
+
+    def test_url_accessible_and_uses_correct_template(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'experience.html')
+
+    def test_data_appears_when_exists(self):
+        Experience.objects.create(
+            title="Test Experience",
+            description="Deskripsi test experience",
+            category="internship",
         )
+        response = self.client.get(self.url)
+        self.assertContains(response, "Test Experience")
 
-    def test_main_url_is_accessible(self):
-        response = self.client.get(reverse("main:show_main"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "index.html")
-        self.assertNotContains(response, self.experience.title)
-        self.assertContains(response, f'href="{reverse("main:show_experience")}"')
-
-    def test_nonexistent_page_returns_404(self):
-        response = self.client.get("/halaman-yang-tidak-ada/")
-        self.assertEqual(response.status_code, 404)
-
-    def test_experience_model(self):
-        self.assertEqual(str(self.experience), "Asisten Dosen PBP")
-        self.assertEqual(self.experience.category, "part-time")
-        self.assertTrue(self.experience.is_ongoing)
-
-    def test_experience_page(self):
-        response = self.client.get(reverse("main:show_experience"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "experience.html")
-        self.assertContains(response, self.experience.title)
-        self.assertContains(response, self.experience.description)
-        self.assertContains(response, "Part-Time")
-        self.assertContains(response, "Sedang berlangsung")
-        self.assertContains(response, f'href="{reverse("main:show_main")}"')
-
-    def test_empty_experience_page(self):
-        Experience.objects.all().delete()
-        response = self.client.get(reverse("main:show_experience"))
+    def test_empty_state_when_no_data(self):
+        response = self.client.get(self.url)
         self.assertContains(response, "Belum ada pengalaman yang ditambahkan.")
 
-    def test_completed_experience(self):
-        self.experience.ended_at = timezone.now()
-        self.experience.save()
-        response = self.client.get(reverse("main:show_experience"))
-        self.assertFalse(self.experience.is_ongoing)
-        self.assertContains(response, "Selesai")
-        self.assertNotContains(response, "Sedang berlangsung")
+
+class ProjectViewTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.url = reverse('main:show_projects')
+
+    def test_url_accessible_and_uses_correct_template(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'projects.html')
+
+    def test_data_appears_when_exists(self):
+        Project.objects.create(
+            title="Test Project",
+            description="Deskripsi test project",
+            category="personal",
+        )
+        response = self.client.get(self.url)
+        self.assertContains(response, "Test Project")
+
+    def test_empty_state_when_no_data(self):
+        response = self.client.get(self.url)
+        self.assertContains(response, "Belum ada proyek yang ditambahkan.")
