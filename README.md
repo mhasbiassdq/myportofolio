@@ -28,3 +28,17 @@
 
 ### Tugas 2
 
+1. Jelaskan alur yang terjadi ketika pengguna membuka halaman portofolio baru, mulai dari permintaan yang diterima proyek hingga data ditampilkan pada *browser*. Dalam jawabanmu, jelaskan peran `urls.py` proyek, `urls.py` aplikasi, *view*, model, dan *template*.
+   - Permintaan pertama diterima oleh `urls.py` level proyek, yang meneruskannya ke `urls.py` aplikasi `main` lewat `include()`. Di `main/urls.py`, path `"projects/"` dicocokkan ke *view* `show_projects`. *View* ini mengambil data lewat `Project.objects.all()`, memasukkannya ke `context`, lalu me-`render` `template` `projects.html`. Di *template*, data ditampilkan dengan perulangan `{% for %}`, dan hasil HTML-nya dikirim balik sebagai *response* ke *browser*.
+
+2. Mengapa data untuk bagian portofolio baru sebaiknya disimpan pada model dan tidak ditulis langsung di dalam *template*? Jelaskan dampaknya terhadap kemudahan pemeliharaan dan pengembangan aplikasi.
+   - Karena kalau data ditulis langsung di *template* (*hardcoded*), setiap kali ada perubahan data saya harus edit file HTML dan deploy ulang. Kalau disimpan di model, data bisa diubah kapan saja lewat Django *admin* atau *shell* tanpa menyentuh kode *template* sama sekali, sehingga lebih mudah dipelihara dan tetap konsisten di semua halaman yang memakai data yang sama.
+
+3. Apa perbedaan fungsi `makemigrations` dan `migrate` pada Django? Berikan contoh perubahan model yang mengharuskanmu menjalankan kedua perintah tersebut.
+   - `makemigrations` membuat berkas migrasi berdasarkan perubahan yang terdeteksi di model, tanpa langsung mengubah database. `migrate` menerapkan berkas migrasi itu ke database sehingga skemanya benar-benar berubah. Contohnya saat saya menambahkan model `Project` baru — setelah nulis `class Project` di `models.py`, saya jalankan `makemigrations` untuk bikin file migrasinya, lalu `migrate` supaya tabelnya benar-benar terbentuk di database dan bisa mulai diisi data.
+
+## AI Disclosure
+- **Peran AI:** AI digunakan sebagai *learning partner* untuk berdiskusi menyusun struktur model `Project`, alur *view*-*template* mengikuti pola `Experience` yang sudah ada, serta membantu menelusuri penyebab error saat pengisian data lewat *shell* (`ImportError`) dan konfigurasi `urls.py`.
+- **Keterbatasan AI:** Saran awal AI perlu disesuaikan lagi dengan konvensi penamaan dan struktur proyek yang sudah saya buat sebelumnya, termasuk detail *field* model dan isi data aktual.
+- **Perbaikan & Eksekusi Manual:** Saya menuliskan dan menjalankan sendiri perintah `makemigrations`/`migrate`, mengisi data lewat *shell*, menguji halaman lewat `runserver`, serta menulis `unit test` dan menyesuaikannya sampai seluruh test lulus.
+
