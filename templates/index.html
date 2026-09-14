@@ -16,6 +16,7 @@
             <nav>
                 <a href="{% url 'main:show_main' %}">Profile</a>
                 <a href="{% url 'main:show_experience' %}">Experience</a>
+                <a href="{% url 'main:show_projects' %}">Projects</a>
             </nav>
         </div>
     </header>
@@ -55,47 +56,30 @@
         <section id="experience" class="portfolio-section">
             <h2>Experience & Leadership</h2>
             <div class="grid-container">
-                <article class="card">
-                    <h3>Head of Mental Health & Care Division</h3>
-                    <p class="card-subtitle">BPA Fasilkom UI &middot; 2025 - Present</p>
-                    <p>Managed team-based mental health programs to support the psychological well-being of Fasilkom UI students.</p>
-                </article>
-                <article class="card">
-                    <h3>President</h3>
-                    <p class="card-subtitle">MAN Insan Cendekia OKI Alumni Association &middot; 2025 - Present</p>
-                    <p>Led strategic initiatives and strengthened cross-generational alumni networks through structured engagement programs.</p>
-                </article>
-                <article class="card">
-                    <h3>Staff of Human Resources Development</h3>
-                    <p class="card-subtitle">BEM FASILKOM UI &middot; 2026</p>
-                    <p>Contributed to human resource management, internal organizational development, and student work program coordination.</p>
-                </article>
-                <article class="card">
-                    <h3>Marketing & Event Roles</h3>
-                    <p class="card-subtitle">COMPFEST 18 & Toska Kemas UI &middot; 2026</p>
-                    <p>Managed marketing strategies and core event operations for major IT festival and faculty celebration.</p>
-                </article>
+                {% for experience in experience_list %}
+                    <article class="card">
+                        <h3>{{ experience.title }}</h3>
+                        <p class="card-subtitle">{{ experience.get_category_display }}</p>
+                        <p>{{ experience.description }}</p>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Belum ada pengalaman yang ditambahkan.</p>
+                {% endfor %}
             </div>
         </section>
 
         <section id="projects" class="portfolio-section">
             <h2>Projects & Competitions</h2>
             <div class="grid-container">
-                <article class="card">
-                    <h3>Air Pollution Predictive Model</h3>
-                    <p class="card-subtitle">Data Science Competition &middot; 2026</p>
-                    <p>Designed data processing notebooks and predictive models for air pollution datasets in a national competition.</p>
-                </article>
-                <article class="card">
-                    <h3>Google Developer Groups on Campus</h3>
-                    <p class="card-subtitle">GDGoC UI &middot; 2026</p>
-                    <p>Actively participated in technical development sessions, collaborative studies, and data science explorations within the developer community.</p>
-                </article>
-                <article class="card">
-                    <h3>Business Case & Innovation Summit</h3>
-                    <p class="card-subtitle">ShARE & Manifest ITS &middot; 2025 - 2026</p>
-                    <p>Developed business case analysis strategies, innovative solution proposals, and advanced presentation decks for high-level competitions.</p>
-                </article>
+                {% for project in project_list %}
+                    <article class="card">
+                        <h3>{{ project.title }}</h3>
+                        <p class="card-subtitle">{{ project.get_category_display }}</p>
+                        <p>{{ project.description }}</p>
+                    </article>
+                {% empty %}
+                    <p class="empty-state">Belum ada proyek yang ditambahkan.</p>
+                {% endfor %}
             </div>
         </section>
     </main>
