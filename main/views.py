@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from main.models import Experience, Project
+from main.forms import ProjectForm
 
 def show_main(request):
     context = {
@@ -28,3 +30,17 @@ def show_projects(request):
         "project_list": Project.objects.all(),
     }
     return render(request, "projects.html", context)
+
+def create_project(request):
+    form = ProjectForm(request.POST or None)
+
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Proyek baru berhasil ditambahkan!")
+        return redirect("main:show_projects")
+
+    context = {
+        "name": "Muhammad Hasbi Assiddiq",
+        "form": form,
+    }
+    return render(request, "projects_form.html", context)
