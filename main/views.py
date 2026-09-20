@@ -19,12 +19,15 @@ def show_main(request):
     }
     return render(request, "index.html", context)
 
-def show_experience(request):
-    context = {
-        "name": "Muhammad Hasbi Assiddiq",
-        "experience_list": Experience.objects.all(),
-    }
-    return render(request, "experience.html", context)
+def get_experience_json(request):
+    title_query = request.GET.get("title", "").strip()
+    experiences = Experience.objects.all()
+    
+    if title_query:
+        experiences = experiences.filter(title__icontains=title_query)
+        
+    experiences_json = serializers.serialize("json", experiences)
+    return HttpResponse(experiences_json, content_type="application/json")
 
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
