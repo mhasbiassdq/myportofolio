@@ -43,6 +43,20 @@ def show_experience(request):
     }
     return render(request, "experience.html", context)
 
+def create_experience(request):
+    form = ExperienceForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Pengalaman baru berhasil ditambahkan!")
+        return redirect("main:show_experience")
+    
+    context = {
+        "name": "Muhammad Hasbi Assiddiq",
+        "form": form,
+        "page_title": "Tambah Pengalaman Baru", 
+    }
+    return render(request, "experience_form.html", context)
+
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
     projects = Project.objects.all()
