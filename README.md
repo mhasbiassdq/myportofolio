@@ -5,6 +5,7 @@
 - **PWS Deployment:** http://muhammad.hasbi52.pws.cs.ui.ac.id/
 
 ## Setup
+
 1. Clone repositori ke perangkat lokal.
 2. Buat dan aktifkan *virtual environment* (`python -m venv env`).
 3. Install dependensi (`pip install -r requirements.txt`).
@@ -40,8 +41,20 @@
 ## AI Disclosure
 - **Peran AI:** AI digunakan sebagai *learning partner* untuk berdiskusi menyusun struktur model `Project`, alur *view*-*template* mengikuti pola `Experience` yang sudah ada, serta membantu menelusuri penyebab error saat pengisian data lewat *shell* (`ImportError`) dan konfigurasi `urls.py`.
 - **Keterbatasan AI:** Saran awal AI perlu disesuaikan lagi dengan konvensi penamaan dan struktur proyek yang sudah saya buat sebelumnya, termasuk detail *field* model dan isi data aktual.
-- **Perbaikan & Eksekusi Manual:** Saya menuliskan dan menjalankan sendiri perintah `makemigrations`/`migrate`, mengisi data lewat *shell*, menguji halaman lewat `runserver`, serta menulis `unit test` dan menyesuaikannya sampai seluruh test lulus.
+- **Perbaikan & Eksekusi Manual:** Menuliskan dan menjalankan mandiri perintah `makemigrations`/`migrate`, mengisi data lewat *shell*, menguji halaman lewat `runserver`, serta menulis `unit test` dan menyesuaikannya sampai seluruh test lulus.
 
-### Tutorial 3
+### Tugas 3
 
-- Tutorial 3 Done 
+1. Jelaskan mengapa kita menggunakan ModelForm pada Django alih-alih membuat form HTML secara manual. Selain itu, jelaskan pula mengapa kita diwajibkan menambahkan {% csrf_token %} pada form tersebut!   
+   - Menggunakan ModelForm jauh lebih efisien karena Django secara otomatis membuatkan elemen input HTML (beserta validasinya) berdasarkan struktur model yang sudah ada (seperti Project atau Experience). Ini menghemat waktu, mencegah penulisan kode yang berulang, dan memudahkan penyimpanan data langsung ke database. Sementara itu, {% csrf_token %} sangat diwajibkan untuk keamanan dari serangan Cross-Site Request Forgery. Token unik ini berfungsi sebagai verifikasi keamanan untuk memastikan bahwa data (POST request) yang dikirim benar-benar berasal dari pengguna di situs web kita sendiri, bukan dari script jahat di situs web lain.
+
+2. Pada Tutorial 03, kita membahas format data JSON dan XML. Mengapa JSON lebih disukai dalam pengembangan aplikasi web modern dibandingkan XML?
+   - JSON (JavaScript Object Notation) lebih disukai karena sintaksnya jauh lebih ringan, ringkas, dan lebih mudah dibaca dibandingkan XML. XML cenderung boros karakter karena mengharuskan penulisan tag pembuka dan penutup di setiap data. Selain itu, JSON berakar dari JavaScript, sehingga data yang dikirim dalam format JSON bisa langsung diolah (parsing) secara native dan sangat cepat oleh sistem frontend web modern tanpa memerlukan alat konversi tambahan.
+
+3. Jelaskan alur yang terjadi saat kamu menggunakan fungsi view untuk mengembalikan data portofoliomu dalam bentuk JSON. Mengapa kita perlu melakukan proses serialization pada model Django sebelum datanya dikembalikan?
+   - Alurnya dimulai ketika klien (browser/Postman) melakukan request ke endpoint URL yang telah ditentukan (contoh: /api/experience/). URL tersebut mengarahkan request ke fungsi view (seperti get_experience_json). Di dalam view, aplikasi akan melakukan query ke database (misal: Experience.objects.all()). Data yang didapat ini masih berupa QuerySet (objek kompleks bawaan Python/Django). Di sinilah proses serialization diperlukan: kita harus mengubah objek kompleks tersebut menjadi format teks (seperti string JSON) agar datanya bisa dikirim melalui jaringan internet (protokol HTTP). Setelah diubah menjadi JSON, string tersebut dibungkus menggunakan HttpResponse dengan tipe konten application/json dan dikirimkan kembali sebagai response ke klien.
+
+## AI Disclosure
+- **Peran AI:** AI digunakan sebagai pair programmer untuk berdiskusi memahami sintaks ModelForm, logika pengambilan data berdasarkan ID untuk fitur Update (penggunaan instance), serta membantu merancang struktur Pop-up Modal HTML untuk konfirmasi penghapusan data.
+- **Keterbatasan AI:** Kode snippet awal yang diberikan AI seringkali menggunakan gaya styling atau kelas CSS bawaan (default) yang tidak cocok dengan desain antarmuka portofolio yang sudah saya buat di Tugas 1. AI juga kadang memberikan saran impor (import statements) yang kurang lengkap atau tidak terpakai.
+- **Perbaikan & Eksekusi Manual:** Secara manual mengintegrasikan logika views.py dan forms.py agar sinkron dengan model Experience saya. Juga menulis ulang penamaan kelas CSS pada form dan modal agar menyatu mulus dengan style.css bawaan proyek saya, serta melakukan uji coba fitur Create, Update, Delete, dan pencarian (Search) langsung di server lokal dengan meminta bantuan teman.
