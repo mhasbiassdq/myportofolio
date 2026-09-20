@@ -59,6 +59,15 @@ def edit_experience(request, experience_id):
     }
     return render(request, "experience_form.html", context)
 
+def delete_experience(request, experience_id):
+    experience = get_object_or_404(Experience, pk=experience_id)
+    if request.method == "POST":
+        experience.delete()
+        messages.success(request, "Pengalaman berhasil dihapus!")
+        return redirect("main:show_experience")
+        
+    return redirect("main:show_experience")
+
 
 def create_experience(request):
     form = ExperienceForm(request.POST or None)
