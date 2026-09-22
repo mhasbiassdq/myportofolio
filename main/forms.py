@@ -1,5 +1,5 @@
 from django.forms import ModelForm, TextInput, Textarea, Select, URLInput
-from main.models import Project, Experience 
+from main.models import Project, Experience, Skills
 
 class ProjectForm(ModelForm):
     class Meta:
@@ -54,3 +54,9 @@ class ExperienceForm(ModelForm):
                 "placeholder": "https://url-gambar-kamu.com"
             }),
         }
+        
+class SkillsForm(ModelForm):
+    class Meta:
+        model = Skills
+        fields = ["nama_skill", "tingkat_keahlian", "deskripsi"]
+        

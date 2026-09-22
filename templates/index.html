@@ -64,5 +64,34 @@
             {% endfor %}
         </div>
     </section>
+
+    <section id="skills" class="portfolio-section">
+        <h2>My Skills</h2>
+        <!-- Kita pakai class grid-container yang udah ada biar desainnya sama persis! -->
+        <div class="grid-container">
+            
+            <!-- Koki mulai mengeluarkan isi nampan skills_list -->
+            {% for skill in skills_list %}
+                <article class="card">
+                    <h3>{{ skill.nama_skill }}</h3>
+                    <p class="card-subtitle">{{ skill.tingkat_keahlian }}</p>
+                    <p>{{ skill.deskripsi }}</p>
+                    <a href="{% url 'main:delete_skill' skill.id %}">
+                        <button class="btn btn-danger">Hapus</button>
+                    </a>
+                </article>
+            {% empty %}
+                <!-- Kalau databasenya masih kosong -->
+                <p class="empty-state">Belum ada skill yang ditambahkan.</p>
+            {% endfor %}
+            
+        </div>
+        
+        <!-- Tombol jalan pintas untuk nambah skill baru dari halaman depan -->
+        <br>
+        <a href="{% url 'main:add_skill' %}">
+            <button class="btn btn-primary">Tambah Skill Baru</button>
+        </a>
+    </section>
 </main>
 {% endblock content %}

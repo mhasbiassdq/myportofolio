@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
-from main.models import Experience, Project
-from main.forms import ProjectForm, ExperienceForm
+from main.models import Experience, Project, Skills 
+from main.forms import ProjectForm, ExperienceForm, SkillsForm
 
 def show_main(request):
     context = {
@@ -16,8 +16,10 @@ def show_main(request):
         ),
         "experience_list": Experience.objects.all(),
         "project_list": Project.objects.all(),
+        "skills_list": Skills.objects.all(),
     }
     return render(request, "index.html", context)
+    
 
 def get_experience_json(request):
     title_query = request.GET.get("title", "").strip()
@@ -131,3 +133,23 @@ def create_project(request):
         "form": form,
     }
     return render(request, "projects_form.html", context)
+
+def add_skill(request):
+    form = SkillsForm(request.POST or None)
+    
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect('main:show_main')
+    
+    context = {'form': form}
+    return render(request, "add_skill.html", context)
+
+def delete_skill(request, id):
+    # 1. Koki nyari spesifik 1 barang di kulkas berdasarkan ID-nya
+    skill_yang_mau_dihapus = Skills.objects.get(pk=id)
+    
+    # 2. BUM! Hapus barangnya dari kulkas
+    skill_yang_mau_dihapus.delete()
+    
+    # 3. Balikin tamu ke halaman utama seolah nggak terjadi apa-apa
+    return redirect('main:show_main')

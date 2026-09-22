@@ -43,8 +43,13 @@ class Project(models.Model):
     ended_at = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return self.title
+        return self.titlep
 
     @property
     def is_ongoing(self):
         return self.ended_at is None
+    
+class Skills(models.Model):
+    nama_skill = models.CharField(max_length=255)
+    tingkat_keahlian = models.CharField(max_length=50)
+    deskripsi = models.TextField()

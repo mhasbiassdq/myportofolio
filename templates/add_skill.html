@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Tambah Keahlian Baru</h1>
+    
+    <!-- Formulir ini pakai method POST supaya datanya aman/tersembunyi -->
+    <form method="POST">
+        <!-- 🚨 MANTRA WAJIB ANTI-MALING 🚨 -->
+        {% csrf_token %}
+        
+        <!-- Ini sihir Django biar form-mu tercetak otomatis ke bawah dengan rapi -->
+        {{ form.as_p }}
+        
+        <button type="submit" class="btn btn-primary">Simpan Skill</button>
+    </form>
+    
+    <!-- Tombol buat balik ke halaman utama kalau nggak jadi nambah -->
+    <br>
+    <a href="{% url 'main:show_main' %}">
+        <button class="btn btn-secondary">Kembali</button>
+    </a>
+</div>
+{% endblock content %}
