@@ -6,14 +6,15 @@ from django.core import serializers
 from django.http import HttpResponse
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
-
-from main.models import Experience, Project
-from main.forms import ProjectForm, ExperienceForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 
+from main.models import Experience, Project
+from main.forms import ProjectForm, ExperienceForm
+
 def show_main(request):
-    # Baris ini buat nangkep cookie dari browser
+    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
+    
     last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
     
     context = {
@@ -24,10 +25,11 @@ def show_main(request):
             "Mahasiswa Sistem Informasi Fakultas Ilmu Komputer Universitas Indonesia "
             "yang tertarik pada data dan aktif berorganisasi."
         ),
-        # Baris ini buat ngirim data cookie-nya ke HTML
         "last_login": last_login, 
+        "is_editor": is_editor, 
     }
     return render(request, "index.html", context)
+
 
 def get_experience_json(request):
     title_query = request.GET.get("title", "").strip()
@@ -39,7 +41,10 @@ def get_experience_json(request):
     experiences_json = serializers.serialize("json", experiences)
     return HttpResponse(experiences_json, content_type="application/json")
 
+
 def show_experience(request):
+    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
+    
     json_response = get_experience_json(request)
     experiences_deserialized = serializers.deserialize("json", json_response.content.decode("utf-8"))
     experiences = [exp.object for exp in experiences_deserialized]
@@ -50,10 +55,17 @@ def show_experience(request):
         "name": "Muhammad Hasbi Assiddiq",
         "experience_list": experiences,
         "title_query": title_query,
+        "is_editor": is_editor, 
     }
     return render(request, "experience.html", context)
 
+
+@login_required(login_url="/login/")
 def edit_experience(request, experience_id):
+    is_editor = request.user.groups.filter(name='Editor').exists()
+    if not (request.user.is_superuser or is_editor):
+        raise PermissionDenied
+
     experience = get_object_or_404(Experience, pk=experience_id)
     form = ExperienceForm(request.POST or None, instance=experience)
     
@@ -65,11 +77,17 @@ def edit_experience(request, experience_id):
     context = {
         "name": "Muhammad Hasbi Assiddiq",
         "form": form,
-        "page_title": "Edit Pengalaman", #
+        "page_title": "Edit Pengalaman",
     }
     return render(request, "experience_form.html", context)
 
+
+@login_required(login_url="/login/")
 def delete_experience(request, experience_id):
+    # Hanya Superuser yang boleh menghapus data
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     experience = get_object_or_404(Experience, pk=experience_id)
     if request.method == "POST":
         experience.delete()
@@ -79,7 +97,11 @@ def delete_experience(request, experience_id):
     return redirect("main:show_experience")
 
 
+@login_required(login_url="/login/")
 def create_experience(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     form = ExperienceForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -93,6 +115,7 @@ def create_experience(request):
     }
     return render(request, "experience_form.html", context)
 
+
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
     projects = Project.objects.all()
@@ -100,11 +123,13 @@ def get_projects_json(request):
     if title_query:
         projects = projects.filter(title__icontains=title_query)
         
-    projects_json = serializers.serialize("json", projects)
+    projects_json = serializers.serialize("json", projects, use_natural_foreign_keys=True)
     return HttpResponse(projects_json, content_type="application/json")
 
+
 def show_projects(request):
-    # Mengambil data dari fungsi JSON lalu di-deserialize kembali (sesuai tutorial)
+    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
+    
     json_response = get_projects_json(request)
     projects_deserialized = serializers.deserialize("json", json_response.content.decode("utf-8"))
     projects = [project.object for project in projects_deserialized]
@@ -115,8 +140,10 @@ def show_projects(request):
         "name": "Muhammad Hasbi Assiddiq",
         "project_list": projects,
         "title_query": title_query,
+        "is_editor": is_editor,
     }
     return render(request, "projects.html", context)
+
 
 @login_required(login_url="/login/")
 def delete_project(request, project_id):
@@ -132,6 +159,7 @@ def delete_project(request, project_id):
         return redirect("main:show_projects")
         
     return redirect("main:show_projects")
+
 
 @login_required(login_url="/login/")
 def create_project(request):
@@ -151,6 +179,7 @@ def create_project(request):
     }
     return render(request, "projects_form.html", context)
 
+
 def register(request):
     form = UserCreationForm(request.POST or None)
 
@@ -164,6 +193,7 @@ def register(request):
         "form": form,
     }
     return render(request, "register.html", context)
+
 
 def login_user(request):
     form = AuthenticationForm(request, data=request.POST or None)
@@ -181,11 +211,13 @@ def login_user(request):
     }
     return render(request, "login.html", context)
 
+
 def logout_user(request):
     logout(request)
     response = redirect("main:show_main")
     response.delete_cookie('last_login')
     return response
+
 
 @login_required(login_url="/login/")
 def toggle_star(request, project_id):

@@ -58,3 +58,22 @@
 - **Peran AI:** AI digunakan sebagai pair programmer untuk berdiskusi memahami sintaks ModelForm, logika pengambilan data berdasarkan ID untuk fitur Update (penggunaan instance), serta membantu merancang struktur Pop-up Modal HTML untuk konfirmasi penghapusan data.
 - **Keterbatasan AI:** Kode snippet awal yang diberikan AI seringkali menggunakan gaya styling atau kelas CSS bawaan (default) yang tidak cocok dengan desain antarmuka portofolio yang sudah saya buat di Tugas 1. AI juga kadang memberikan saran impor (import statements) yang kurang lengkap atau tidak terpakai.
 - **Perbaikan & Eksekusi Manual:** Secara manual mengintegrasikan logika views.py dan forms.py agar sinkron dengan model Experience saya. Juga menulis ulang penamaan kelas CSS pada form dan modal agar menyatu mulus dengan style.css bawaan proyek saya, serta melakukan uji coba fitur Create, Update, Delete, dan pencarian (Search) langsung di server lokal dengan meminta bantuan teman.
+
+### Tugas 4
+
+## AI Disclosure
+
+Dalam mengerjakan Tugas 4 ini, saya menggunakan bantuan **Google Gemini** sebagai teman diskusi untuk membantu memecahkan masalah (*troubleshooting*) dan memahami konsep.
+
+**Bagian yang dibantu AI:**
+* **Session & Cookies:** AI membantu menjelaskan alur kerja *cookie* untuk fitur `last_login` dan cara menghapusnya saat *logout*.
+* **Zona Waktu:** Membantu memperbaiki masalah perbedaan jam antara *server* dan waktu lokal dengan mengarahkan saya mengubah konfigurasi `TIME_ZONE` di `settings.py`.
+* **Hak Akses (Otorisasi):** Memberi petunjuk langkah demi langkah cara membatasi akses di `views.py` menggunakan `@login_required`, serta panduan mengatur grup *Editor* melalui antarmuka Django Admin.
+* **Fitur Star:** Membantu merumuskan logika relasi *database* (`ManyToManyField`) dan cara kerja *toggle star* pada *backend*.
+
+**Strategi Prompting & Penyesuaian Manual:**
+Saya menggunakan AI secara bertahap (*step-by-step*). Setiap kali menemui *error* atau kebingungan, saya memberikan *screenshot* masalah atau potongan kode saya kepada AI, lalu meminta penjelasan letak kesalahannya.
+
+Walaupun sangat membantu, kode dari AI jarang bisa langsung di-*copy-paste* 100%. Ada beberapa penyesuaian manual yang harus saya lakukan:
+* AI sering tidak tahu struktur letak file HTML saya, jadi saya harus menyesuaikan sendiri lokasi penempatan *template tag* agar tampilan web tidak berantakan.
+* Sesekali ada karakter yang berlebih dari jawaban AI (seperti kelebihan tanda kurung), sehingga saya tetap harus melakukan *debugging* dan membaca ulang logika kodenya untuk memperbaiki *syntax error*.
