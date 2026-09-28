@@ -1,0 +1,53 @@
+[33m04e50ad[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31mpws/master[m[33m)[m latihan kuis 1  lagi2
+[33mb0e71a4[m[33m ([m[1;31morigin/master[m[33m)[m latihan kuis 1
+[33m9a029a6[m feat: Menjawab pertanyaan reflektif di README
+[33me4a53c0[m feat: Menyesuaikan experience.html
+[33mcb46826[m feat: Menambahkan experience_delete_modal.html di components untuk tombol
+[33mf2277fd[m Menambahkan experience_form.html
+[33m2d4e5f2[m Menambahkan URL baru untuk Experience
+[33m78e16c8[m feat: Menambahkan fungsi fungsi Experience yang baru ke import
+[33ma0b9f57[m feat: Menambahkan fungsi untuk menghapus Experience yang sudah ada
+[33ma501488[m feat: edit Experience yang sudah ada
+[33maedb6bb[m feat: Menambahkan fungsi create untuk menambahkan Experience baru
+[33m00fcb65[m feat: Menambahkan fungsi untuk menampilkan halaman Experience
+[33m6508446[m feat: mengambil data dalam format JSON untuk Experience
+[33mc1532fc[m import: ExperienceForm form main.forms
+[33meebdfe5[m feat: add form for Experience
+[33ma282da3[m finishing tutorial 3: tutorial 3 done yeah!
+[33m6176248[m feat: finish yeay
+[33m20a515f[m feat: add style css
+[33m2c7b46f[m change: projects.html
+[33m13aadf6[m feat: add folder components in templates
+[33m1cc1ffc[m change: show_project
+[33m3404f25[m feat: finishing step 1 and 2
+[33mfeaf79a[m Add header and footer
+[33m5c3ce27[m Add package in head
+[33mbdce7c7[m feat: put load static in base.html
+[33mb66714e[m feat: Add base in templates
+[33m7e3e897[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m feat: Add Readme Tugas 2
+[33m6f1351a[m Add Project model, view, template, and unit tests
+[33mca644d0[m feat: Add Projects & Competition
+[33m25ffc77[m feat:Change Color of Experience
+[33mc6baa7a[m Trigger restart PWS untuk update env variables
+[33mf463e42[m Change: DJango Modul from 5.2 to 5.0
+[33m867dbfa[m cleanup
+[33mf3d6377[m feat: complete Tutorial 2 MVT implementation and unit testing
+[33m756c022[m chore: update django version to 5.2
+[33m2cab2fd[m chore: update django version to 5.0
+[33m9788b06[m fix: ignore env folder and update final README
+[33m5c78e08[m[33m ([m[1;32mmain[m[33m)[m docs: finalize README for PBP Task 1 submission
+[33mde8814b[m refactor(content): translate to English
+[33md493799[m feat(experience): add COMPFEST and Toska Kemas event roles to experience section
+[33mb704d55[m style: implement responsive grid layout and hover effects for cards
+[33me8b45f7[m feat: add projects and competitions section
+[33m119beae[m feat: add experience and leadership section with real CV data
+[33me19aa9d[m feat: add navigation links for new sections
+[33m121d663[m chore: update django settings configuration
+[33mcd32d4b[m style: update color palette to midnight ocean blue
+[33m48c17b7[m feat:tutorial 1 done!
+[33mc4580ca[m feat:tutorial 1 done!
+[33mde89cfb[m fix: remove env folder and db.sqlite3 from git tracking
+[33m74326ac[m feat: setup deployment configuration for PWS and whitenoise
+[33md48a00b[m Initial Django project setup
+[33md3527f1[m Update README.md dengan data baru
+[33m849e3ab[m[33m ([m[1;31morigin/latihan-branch[m[33m, [m[1;32mlatihan-branch[m[33m)[m Add README.md

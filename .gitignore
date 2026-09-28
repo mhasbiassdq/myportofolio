@@ -121,3 +121,4 @@ sftp-config.json
 .env*
 db.sqlite3
 env/
+.venv/
