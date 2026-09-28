@@ -9,6 +9,8 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 from main.models import Experience, Project
 from main.forms import ProjectForm, ExperienceForm
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 
 def show_main(request):
     # Baris ini buat nangkep cookie dari browser
@@ -116,7 +118,12 @@ def show_projects(request):
     }
     return render(request, "projects.html", context)
 
+@login_required(login_url="/login/")
 def delete_project(request, project_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    form = ProjectForm(request.POST or None)
     project = get_object_or_404(Project, pk=project_id)
     
     if request.method == "POST":
@@ -126,7 +133,11 @@ def delete_project(request, project_id):
         
     return redirect("main:show_projects")
 
+@login_required(login_url="/login/")
 def create_project(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     form = ProjectForm(request.POST or None)
 
     if request.method == "POST" and form.is_valid():
