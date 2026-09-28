@@ -1,14 +1,19 @@
+import datetime
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core import serializers
 from django.http import HttpResponse
-from main.models import Experience, Project
-from main.forms import ProjectForm, ExperienceForm
-from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
+from main.models import Experience, Project
+from main.forms import ProjectForm, ExperienceForm
+
 def show_main(request):
+    # Baris ini buat nangkep cookie dari browser
+    last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
+    
     context = {
         "name": "Muhammad Hasbi Assiddiq",
         "npm": "2506624360",
@@ -17,8 +22,8 @@ def show_main(request):
             "Mahasiswa Sistem Informasi Fakultas Ilmu Komputer Universitas Indonesia "
             "yang tertarik pada data dan aktif berorganisasi."
         ),
-        "experience_list": Experience.objects.all(),
-        "project_list": Project.objects.all(),
+        # Baris ini buat ngirim data cookie-nya ke HTML
+        "last_login": last_login, 
     }
     return render(request, "index.html", context)
 
@@ -153,15 +158,20 @@ def login_user(request):
     form = AuthenticationForm(request, data=request.POST or None)
 
     if request.method == "POST" and form.is_valid():
-        login(request, form.get_user())
-        return redirect("main:show_main")
+        user = form.get_user()
+        login(request, user)
+        response = redirect("main:show_main")
+        response.set_cookie('last_login', datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        return response
 
     context = {
-        "name": "Muhammad Hasbi Assiddiq",
+        "name": "Muhammad Hasbi Assiddiq", 
         "form": form,
     }
     return render(request, "login.html", context)
 
 def logout_user(request):
     logout(request)
-    return redirect("main:show_main")
+    response = redirect("main:show_main")
+    response.delete_cookie('last_login')
+    return response
