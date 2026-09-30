@@ -6,7 +6,7 @@
     <div class="retro-window" style="max-width: 600px;">
         
         <div class="title-bar">
-            <div class="title-bar-text">📝 register.exe</div>
+            <div class="title-bar-text">📝 add_education.exe</div>
             <div class="title-bar-controls">
                 <div class="control-btn close-btn"></div>
                 <div class="control-btn min-btn"></div>
@@ -16,23 +16,21 @@
         
         <div class="window-body">
             <div style="margin-bottom: 20px;">
-                <a href="{% url 'main:show_main' %}" class="retro-btn btn-small bg-blue">⬅ Back to Home</a>
+                <a href="{% url 'main:show_education' %}" class="retro-btn btn-small bg-blue">⬅ Back to Education</a>
             </div>
 
-            <div class="retro-form-container">
-                <h2 class="retro-title" style="font-size: 2.5rem; text-align: center; margin-bottom: 20px;">REGISTER USER</h2>
-                
+            <div class="retro-form-container" style="background-color: #ffde59;"> <!-- Formnya warna kuning ala sticky note -->
+                <h2 class="retro-title" style="font-size: 2rem; text-align: center; margin-bottom: 20px; color: #111; -webkit-text-stroke: 0px;">
+                    ADD EDUCATION
+                </h2>
+
                 <form method="POST" action="">
                     {% csrf_token %}
                     {{ form.as_p }}
-                    <button type="submit" class="retro-btn bg-pink" style="width: 100%; margin-top: 20px; font-size: 1.2rem;">💾 CREATE ACCOUNT</button>
+                    
+                    <button type="submit" class="retro-btn bg-pink" style="width: 100%; margin-top: 20px; font-size: 1.2rem;">📌 TEMPEL CATATAN</button>
                 </form>
-                
-                <p style="text-align: center; margin-top: 20px; font-weight: bold;">
-                    Sudah punya akun? <a href="{% url 'main:login' %}" style="color: #72a2ff;">Login di sini</a>.
-                </p>
             </div>
-            
         </div>
     </div>
 </div>

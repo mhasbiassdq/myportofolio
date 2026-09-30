@@ -1,33 +1,47 @@
-{% extends "base.html" %}
-{% block meta %}
-    <title>Login - {{ name }}</title>
-{% endblock meta %}
+{% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
-    <main>
-        <section class="experience-section">
-            <div class="container">
-                <h1>Login</h1>
-                {% for message in messages %}
-                    <p class="form-message">{{ message }}</p>
-                {% endfor %}
-                <form method="post" action="{% url 'main:login' %}" class="project-form">
-                    {% csrf_token %}
-                    {% for field in form %}
-                        <div class="form-group">
-                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                            {{ field }}
-                            {% for error in field.errors %}
-                                <p class="form-error">{{ error }}</p>
-                            {% endfor %}
+<div class="os-background" style="background-image: url('{% static 'img/rumput.jpeg' %}');">
+    <div class="retro-window" style="max-width: 600px;">
+        
+        <div class="title-bar">
+            <div class="title-bar-text">🔐 login.exe</div>
+            <div class="title-bar-controls">
+                <div class="control-btn close-btn"></div>
+                <div class="control-btn min-btn"></div>
+                <div class="control-btn max-btn"></div>
+            </div>
+        </div>
+        
+        <div class="window-body">
+            <div style="margin-bottom: 20px;">
+                <a href="{% url 'main:show_main' %}" class="retro-btn btn-small bg-blue">⬅ Back to Home</a>
+            </div>
+
+            <div class="retro-form-container">
+                <h2 class="retro-title" style="font-size: 2.5rem; text-align: center; margin-bottom: 20px;">SYSTEM LOGIN</h2>
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        <div style="background: #ffde59; border: 2px dashed #111; padding: 10px; margin-bottom: 15px; text-align: center; font-weight: bold;">
+                            {{ message }}
                         </div>
                     {% endfor %}
-                    {% for error in form.non_field_errors %}
-                        <p class="form-error">{{ error }}</p>
-                    {% endfor %}
-                    <button type="submit" class="button">Login</button>
+                {% endif %}
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit" class="retro-btn bg-pink" style="width: 100%; margin-top: 20px; font-size: 1.2rem;">🚀 LOGIN</button>
                 </form>
-                <p>Belum punya akun? <a href="{% url 'main:register' %}">Daftar di sini</a>.</p>
+                
+                <p style="text-align: center; margin-top: 20px; font-weight: bold;">
+                    Belum punya akun? <a href="{% url 'main:register' %}" style="color: #ff61a6;">Register di sini</a>.
+                </p>
             </div>
-        </section>
-    </main>
+
+        </div>
+    </div>
+</div>
 {% endblock content %}

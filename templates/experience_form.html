@@ -1,37 +1,43 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block meta %}
-    <title>{{ page_title }} - {{ name }}</title>
-{% endblock meta %}
-
 {% block content %}
-<main>
-    <section class="experience-section">
-        <div class="container">
-            <p class="section-kicker">Perjalanan & Organisasi</p>
-            <h1>{{ page_title }}</h1>
-            
-            <form method="POST" class="project-form">
-                {% csrf_token %}
-                
-                {% for field in form %}
-                    <div class="form-group">
-                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {{ field }}
-                        
-                        {% for error in field.errors %}
-                            <p class="form-error">{{ error }}</p>
-                        {% endfor %}
-                    </div>
-                {% endfor %}
-                
-                <div style="margin-top: 2rem;">
-                    <button type="submit" class="button">Simpan Data</button>
-                    <a href="{% url 'main:show_experience' %}" class="button button-secondary" style="margin-left: 10px;">Batal</a>
-                </div>
-            </form>
+<div class="os-background" style="background-image: url('{% static 'img/rumput.jpeg' %}');">
+    <div class="retro-window" style="max-width: 700px;">
+        
+        <div class="title-bar">
+            <div class="title-bar-text">📝 add_experience.exe</div>
+            <div class="title-bar-controls">
+                <div class="control-btn close-btn"></div>
+                <div class="control-btn min-btn"></div>
+                <div class="control-btn max-btn"></div>
+            </div>
         </div>
-    </section>
-</main>
+        
+        <div class="window-body">
+            <div style="margin-bottom: 20px;">
+                <a href="{% url 'main:show_experience' %}" class="retro-btn btn-small bg-blue">⬅ Back to Experience</a>
+            </div>
+
+            <div class="retro-form-container">
+                <h2 class="retro-title" style="font-size: 2.5rem; text-align: center; margin-bottom: 20px;">
+                    {% if form.instance.pk %}EDIT EXPERIENCE{% else %}ADD EXPERIENCE{% endif %}
+                </h2>
+                
+                <p style="text-align: center; font-weight: bold; margin-bottom: 20px;">
+                    Simpan rekam jejak lu ke dalam folder arsip!
+                </p>
+
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 30px;">
+                        <button type="submit" class="retro-btn bg-yellow" style="flex: 1; font-size: 1.2rem;">💾 SAVE TO FOLDER</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}

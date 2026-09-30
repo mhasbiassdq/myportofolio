@@ -1,5 +1,6 @@
 from django.forms import ModelForm, TextInput, Textarea, Select, URLInput
-from main.models import Project, Experience 
+from main.models import Project, Experience, Education
+from django import forms
 
 class ProjectForm(ModelForm):
     class Meta:
@@ -22,7 +23,7 @@ class ProjectForm(ModelForm):
                 "placeholder": "Ceritakan proyekmu secara singkat...", 
                 "rows": 3
             }),
-            "category": Select(), # Otomatis mengambil pilihan dari PROJECT_CHOICES
+            "category": Select(), 
             "thumbnail": URLInput(attrs={
                 "placeholder": "https://url-gambar-kamu.com"
             }),
@@ -54,3 +55,8 @@ class ExperienceForm(ModelForm):
                 "placeholder": "https://url-gambar-kamu.com"
             }),
         }
+
+class EducationForm(forms.ModelForm):
+    class Meta:
+        model = Education
+        fields = ['institution', 'degree', 'start_year', 'end_year', 'description']

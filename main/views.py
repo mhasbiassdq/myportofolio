@@ -9,8 +9,8 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 
-from main.models import Experience, Project
-from main.forms import ProjectForm, ExperienceForm
+from main.models import Experience, Project, Education
+from main.forms import ProjectForm, ExperienceForm, EducationForm
 
 def show_main(request):
     is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
@@ -22,8 +22,8 @@ def show_main(request):
         "npm": "2506624360",
         "study_program": "Sistem Informasi",
         "bio": (
-            "Mahasiswa Sistem Informasi Fakultas Ilmu Komputer Universitas Indonesia "
-            "yang tertarik pada data dan aktif berorganisasi."
+            "Information Systems undergraduate at Universitas Indonesia, specializing in Data Science and Artificial Intelligence. "
+            "I am a tech enthusiast and proactive leader passionate about transforming complex data into impactful digital solutions."
         ),
         "last_login": last_login, 
         "is_editor": is_editor, 
@@ -230,3 +230,48 @@ def toggle_star(request, project_id):
             project.starred_by.add(request.user)
             
     return redirect("main:show_projects")
+
+def show_education(request):
+    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
+    
+    # Mengambil semua data pendidikan dan diurutkan dari tahun masuk terbaru
+    educations = Education.objects.all().order_by('-start_year')
+
+    context = {
+        "name": "Muhammad Hasbi Assiddiq",
+        "education_list": educations,
+        "is_editor": is_editor,
+    }
+    return render(request, "education.html", context)
+
+
+@login_required(login_url="/login/")
+def create_education(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    form = EducationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Riwayat Pendidikan berhasil ditambahkan!")
+        return redirect("main:show_education")
+
+    context = {
+        "name": "Muhammad Hasbi Assiddiq",
+        "form": form,
+    }
+    return render(request, "education_form.html", context)
+
+
+@login_required(login_url="/login/")
+def delete_education(request, education_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    education = get_object_or_404(Education, pk=education_id)
+    if request.method == "POST":
+        education.delete()
+        messages.success(request, "Riwayat Pendidikan berhasil dihapus!")
+        return redirect("main:show_education")
+        
+    return redirect("main:show_education")

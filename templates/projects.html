@@ -1,59 +1,96 @@
-{% extends "base.html" %}
-{% block meta %}
-    <title>Projects - {{ name }}</title>
-{% endblock meta %}
+{% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
-<main>
-    <section class="experience-section" id="experience">
-        <div class="container">
-            <p class="section-kicker">Karya yang saya bangun</p>
+<div class="os-background" style="background-image: url('{% static 'img/rumput.jpeg' %}');">
+    
+    <div class="retro-window">
+        
+        <div class="title-bar">
+            <div class="title-bar-text">📁 portfolio.exe - Projects</div>
+            <div class="title-bar-controls">
+                <div class="control-btn close-btn"></div>
+                <div class="control-btn min-btn"></div>
+                <div class="control-btn max-btn"></div>
+            </div>
+        </div>
+
+        <div class="window-body">
             
-            <div class="project-header">
-                <h1>Projects</h1>
-                {% if user.is_superuser %}
-                    <a href="{% url 'main:create_project' %}" class="button project-add-button">Tambah Proyek</a>
+            <div class="retro-nav">
+                <div class="nav-links">
+                    <a href="{% url 'main:show_main' %}" class="nav-item">👤 Profile</a>
+                    <a href="{% url 'main:show_projects' %}" class="nav-item active">🗂️ Projects</a>
+                    <a href="{% url 'main:show_experience' %}" class="nav-item">💼 Experience</a>
+                    <a href="{% url 'main:show_education' %}" class="nav-item">🎓 Education</a>
+                </div>
+                
+                <div class="auth-links">
+                    {% if user.is_authenticated %}
+                        <span class="welcome-text">Hi, {{ user.username }}!</span>
+                        <a href="{% url 'main:logout' %}" class="retro-btn btn-small">Logout</a>
+                    {% else %}
+                        <a href="{% url 'main:login' %}" class="retro-btn btn-small">Login</a>
+                        <a href="{% url 'main:register' %}" class="retro-btn btn-small">Register</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="page-header">
+                <h1 class="retro-title" style="font-size: 3rem; text-align: center;">PROJECTS</h1>
+                <p style="text-align: center; font-weight: bold; margin-bottom: 20px;">
+                    (digital craftsmanship, built from scratch)
+                </p>
+                
+                {% if request.user.is_superuser %}
+                    <div style="text-align: right; margin-bottom: 20px;">
+                        <a href="{% url 'main:create_project' %}" class="retro-btn bg-pink">➕ Add New Project</a>
+                    </div>
                 {% endif %}
             </div>
 
-            <form method="get" action="{% url 'main:show_projects' %}" class="project-search">
-                <input type="search" 
-                       name="title" 
-                       value="{{ title_query }}" 
-                       placeholder="Cari berdasarkan nama proyek" 
-                       class="project-search_input" 
-                       aria-label="Cari berdasarkan nama proyek">
-                <button type="submit" class="button">Cari</button>
-            </form>
-
-            <div class="experience-grid project-grid">
+            <div class="projects-grid">
                 {% for project in project_list %}
-                    <article class="experience-card">
+                    <div class="retro-card">
+                        <div class="card-header">
+                            <span class="tag-label">{{ project.get_category_display }}</span>
+                        </div>
                         
-                        {% if project.thumbnail %}
-                            <img src="{{ project.thumbnail }}" alt="Gambar {{ project.title }}" class="project-image">
-                        {% endif %}
+                        <h3>{{ project.title }}</h3>
+                        <div class="card-divider"></div>
                         
-                        <h2>{{ project.title }}</h2>
-                        <span class="experience-category">{{ project.get_category_display }}</span>
-                        <p class="experience-description">{{ project.description }}</p>
+                        <p class="card-desc">{{ project.description }}</p>
                         
-                        <div class="project-card-actions">
-                            {% include "components/project_star.html" with project=project %}
-                            {% if user.is_superuser %}
-                                {% include "components/project_delete_modal.html" with project=project %}
+                        <div class="card-footer">
+                            <span>📅 {{ project.started_at|date:"M Y" }}</span>
+                            <span>⭐ {{ project.starred_by.count }} Stars</span>
+                        </div>
+                        
+                        <div class="card-actions">
+                            <form action="{% url 'main:toggle_star' project.id %}" method="POST" style="display:inline; width: 100%;">
+                                {% csrf_token %}
+                                <button type="submit" class="retro-btn btn-small" style="width: 100%; background: #fff;">
+                                    {% if request.user in project.starred_by.all %}★ Unstar{% else %}☆ Star{% endif %}
+                                </button>
+                            </form>
+
+                            {% if request.user.is_superuser %}
+                                <form action="{% url 'main:delete_project' project.id %}" method="POST" style="display:inline; margin-top: 10px; width: 100%;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="retro-btn btn-small bg-yellow" style="width: 100%;">🗑 Delete</button>
+                                </form>
                             {% endif %}
                         </div>
-                    </article>
+                    </div>
                 {% empty %}
-                    {% if title_query %}
-                        <p class="empty-state">Tidak ada proyek dengan nama tersebut.</p>
-                    {% else %}
-                        <p class="empty-state">Belum ada proyek yang ditambahkan.</p>
-                    {% endif %}
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 40px; border: 3px dashed #111;">
+                        <h3>No projects found.exe</h3>
+                        <p>Belum ada proyek yang ditambahkan.</p>
+                    </div>
                 {% endfor %}
             </div>
+
         </div>
-    </section>
-</main>
+    </div>
+</div>
 {% endblock content %}
