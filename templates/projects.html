@@ -42,7 +42,7 @@
                     (Digital Craftsmanship, Built from Scratch)
                 </p>
                 
-                {% if user.is_authenticated %}
+                {% if user.is_superuser %}
                     <div style="text-align: right; margin-bottom: 20px;">
                         <button type="button" class="retro-btn bg-pink" popovertarget="add-project-modal">
                             <span aria-hidden="true">➕</span> Add New Project
@@ -75,7 +75,7 @@
     </div>
 </div>
 
-{% if user.is_authenticated %}
+{% if user.is_superuser %}
     {% include "components/project_form_modal.html" %}
 {% endif %}
 
@@ -83,6 +83,7 @@
 const BASE_PROJECTS_ENDPOINT = "{% url 'main:get_projects_json' %}";
 const CREATE_PROJECT_ENDPOINT = "{% url 'main:create_project_ajax' %}";
 const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
+const IS_SUPERUSER = "{{ user.is_superuser|yesno:'true,false' }}" === "true";
 let projectsAbortController;
 
 const loadingState = document.getElementById('loading');
@@ -123,7 +124,7 @@ function buildProjectCardElement(item) {
     const deleteUrl = "{% url 'main:delete_project' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', projectId);
     const starUrl = "{% url 'main:toggle_star' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', projectId);
 
-    const deleteHtml = IS_AUTHENTICATED 
+    const deleteHtml = IS_SUPERUSER 
         ? `<form action="${deleteUrl}" method="POST" style="display:inline; margin-top: 10px; width: 100%;">
             {% csrf_token %}
             <button type="submit" class="retro-btn btn-small bg-yellow" style="width: 100%;" onclick="return confirm('Yakin ingin menghapus project ini?')">🗑 Delete</button>
