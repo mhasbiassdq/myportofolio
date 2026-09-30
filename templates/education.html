@@ -62,7 +62,7 @@
                             <span>⏳ {{ edu.start_year }} - {{ edu.end_year }}</span>
                         </div>
 
-                        {% if request.user.is_superuser %}
+                        {% if user.is_authenticated %}
                             <form action="{% url 'main:delete_education' edu.id %}" method="POST" style="margin-top: 15px;">
                                 {% csrf_token %}
                                 <button type="submit" class="retro-btn btn-small" style="background:#ff0000; color:#fff; width: 100%;">🗑 Buang Catatan</button>

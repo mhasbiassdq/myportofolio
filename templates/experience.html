@@ -42,7 +42,7 @@
                 </h1>
                 <p style="font-weight: bold;">(free stuff, grab a folder)</p>
                 
-                {% if request.user.is_superuser %}
+                {% if user.is_authenticated %}
                     <div style="margin-top: 20px;">
                         <a href="{% url 'main:create_experience' %}" class="retro-btn bg-pink">➕ Add New Experience</a>
                     </div>

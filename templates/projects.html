@@ -42,7 +42,7 @@
                     (digital craftsmanship, built from scratch)
                 </p>
                 
-                {% if request.user.is_superuser %}
+                {% if user.is_authenticated %}
                     <div style="text-align: right; margin-bottom: 20px;">
                         <a href="{% url 'main:create_project' %}" class="retro-btn bg-pink">➕ Add New Project</a>
                     </div>

@@ -7,14 +7,11 @@ from django.http import HttpResponse
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 
 from main.models import Experience, Project, Education
 from main.forms import ProjectForm, ExperienceForm, EducationForm
 
 def show_main(request):
-    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
-    
     last_login = request.COOKIES.get('last_login', 'Belum ada sesi login / Cookie tidak ditemukan')
     
     context = {
@@ -26,10 +23,8 @@ def show_main(request):
             "I am a tech enthusiast and proactive leader passionate about transforming complex data into impactful digital solutions."
         ),
         "last_login": last_login, 
-        "is_editor": is_editor, 
     }
     return render(request, "index.html", context)
-
 
 def get_experience_json(request):
     title_query = request.GET.get("title", "").strip()
@@ -43,29 +38,21 @@ def get_experience_json(request):
 
 
 def show_experience(request):
-    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
-    
     json_response = get_experience_json(request)
     experiences_deserialized = serializers.deserialize("json", json_response.content.decode("utf-8"))
     experiences = [exp.object for exp in experiences_deserialized]
-    
     title_query = request.GET.get("title", "").strip()
 
     context = {
         "name": "Muhammad Hasbi Assiddiq",
         "experience_list": experiences,
         "title_query": title_query,
-        "is_editor": is_editor, 
     }
     return render(request, "experience.html", context)
 
 
 @login_required(login_url="/login/")
 def edit_experience(request, experience_id):
-    is_editor = request.user.groups.filter(name='Editor').exists()
-    if not (request.user.is_superuser or is_editor):
-        raise PermissionDenied
-
     experience = get_object_or_404(Experience, pk=experience_id)
     form = ExperienceForm(request.POST or None, instance=experience)
     
@@ -84,10 +71,6 @@ def edit_experience(request, experience_id):
 
 @login_required(login_url="/login/")
 def delete_experience(request, experience_id):
-    # Hanya Superuser yang boleh menghapus data
-    if not request.user.is_superuser:
-        raise PermissionDenied
-
     experience = get_object_or_404(Experience, pk=experience_id)
     if request.method == "POST":
         experience.delete()
@@ -99,9 +82,6 @@ def delete_experience(request, experience_id):
 
 @login_required(login_url="/login/")
 def create_experience(request):
-    if not request.user.is_superuser:
-        raise PermissionDenied
-
     form = ExperienceForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -115,7 +95,6 @@ def create_experience(request):
     }
     return render(request, "experience_form.html", context)
 
-
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
     projects = Project.objects.all()
@@ -128,31 +107,22 @@ def get_projects_json(request):
 
 
 def show_projects(request):
-    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
-    
     json_response = get_projects_json(request)
     projects_deserialized = serializers.deserialize("json", json_response.content.decode("utf-8"))
     projects = [project.object for project in projects_deserialized]
-    
     title_query = request.GET.get("title", "").strip()
 
     context = {
         "name": "Muhammad Hasbi Assiddiq",
         "project_list": projects,
         "title_query": title_query,
-        "is_editor": is_editor,
     }
     return render(request, "projects.html", context)
 
 
 @login_required(login_url="/login/")
 def delete_project(request, project_id):
-    if not request.user.is_superuser:
-        raise PermissionDenied
-
-    form = ProjectForm(request.POST or None)
     project = get_object_or_404(Project, pk=project_id)
-    
     if request.method == "POST":
         project.delete()
         messages.success(request, "Project berhasil dihapus!")
@@ -163,11 +133,7 @@ def delete_project(request, project_id):
 
 @login_required(login_url="/login/")
 def create_project(request):
-    if not request.user.is_superuser:
-        raise PermissionDenied
-
     form = ProjectForm(request.POST or None)
-
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Proyek baru berhasil ditambahkan!")
@@ -180,9 +146,51 @@ def create_project(request):
     return render(request, "projects_form.html", context)
 
 
+@login_required(login_url="/login/")
+def toggle_star(request, project_id):
+    project = get_object_or_404(Project, pk=project_id)
+    if request.method == "POST":
+        if request.user in project.starred_by.all():
+            project.starred_by.remove(request.user)
+        else:
+            project.starred_by.add(request.user)
+    return redirect("main:show_projects")
+
+def show_education(request):
+    educations = Education.objects.all().order_by('-start_year')
+    context = {
+        "name": "Muhammad Hasbi Assiddiq",
+        "education_list": educations,
+    }
+    return render(request, "education.html", context)
+
+
+@login_required(login_url="/login/")
+def create_education(request):
+    form = EducationForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Riwayat Pendidikan berhasil ditambahkan!")
+        return redirect("main:show_education")
+
+    context = {
+        "name": "Muhammad Hasbi Assiddiq",
+        "form": form,
+    }
+    return render(request, "education_form.html", context)
+
+
+@login_required(login_url="/login/")
+def delete_education(request, education_id):
+    education = get_object_or_404(Education, pk=education_id)
+    if request.method == "POST":
+        education.delete()
+        messages.success(request, "Riwayat Pendidikan berhasil dihapus!")
+        return redirect("main:show_education")
+    return redirect("main:show_education")
+
 def register(request):
     form = UserCreationForm(request.POST or None)
-
     if request.method == "POST" and form.is_valid():
         form.save()
         messages.success(request, "Akun berhasil dibuat. Silakan login.")
@@ -197,7 +205,6 @@ def register(request):
 
 def login_user(request):
     form = AuthenticationForm(request, data=request.POST or None)
-
     if request.method == "POST" and form.is_valid():
         user = form.get_user()
         login(request, user)
@@ -217,61 +224,3 @@ def logout_user(request):
     response = redirect("main:show_main")
     response.delete_cookie('last_login')
     return response
-
-
-@login_required(login_url="/login/")
-def toggle_star(request, project_id):
-    project = get_object_or_404(Project, pk=project_id)
-    
-    if request.method == "POST":
-        if request.user in project.starred_by.all():
-            project.starred_by.remove(request.user)
-        else:
-            project.starred_by.add(request.user)
-            
-    return redirect("main:show_projects")
-
-def show_education(request):
-    is_editor = request.user.groups.filter(name='Editor').exists() if request.user.is_authenticated else False
-    
-    # Mengambil semua data pendidikan dan diurutkan dari tahun masuk terbaru
-    educations = Education.objects.all().order_by('-start_year')
-
-    context = {
-        "name": "Muhammad Hasbi Assiddiq",
-        "education_list": educations,
-        "is_editor": is_editor,
-    }
-    return render(request, "education.html", context)
-
-
-@login_required(login_url="/login/")
-def create_education(request):
-    if not request.user.is_superuser:
-        raise PermissionDenied
-
-    form = EducationForm(request.POST or None)
-    if request.method == "POST" and form.is_valid():
-        form.save()
-        messages.success(request, "Riwayat Pendidikan berhasil ditambahkan!")
-        return redirect("main:show_education")
-
-    context = {
-        "name": "Muhammad Hasbi Assiddiq",
-        "form": form,
-    }
-    return render(request, "education_form.html", context)
-
-
-@login_required(login_url="/login/")
-def delete_education(request, education_id):
-    if not request.user.is_superuser:
-        raise PermissionDenied
-
-    education = get_object_or_404(Education, pk=education_id)
-    if request.method == "POST":
-        education.delete()
-        messages.success(request, "Riwayat Pendidikan berhasil dihapus!")
-        return redirect("main:show_education")
-        
-    return redirect("main:show_education")
