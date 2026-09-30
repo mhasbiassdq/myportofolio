@@ -51,29 +51,24 @@
                 {% endif %}
             </div>
 
-            <!-- Form Pencarian AJAX -->
             <form id="project-search-form" class="project-search" style="margin-bottom: 20px; text-align: center;">
                 <input type="search" id="search-input" name="title" value="{{ title_query }}" placeholder="Cari nama project.exe..." style="padding: 5px; border: 2px solid #111;">
                 <button type="submit" class="retro-btn">Cari</button>
             </form>
 
-            <!-- Status Loading -->
             <div id="loading" class="hide" style="text-align: center; padding: 20px;">
                 <p>⏳ Memuat projects.exe...</p>
             </div>
 
-            <!-- Status Error -->
             <div id="error" class="hide" style="text-align: center; padding: 20px; color: red;">
                 <p>❌ Gagal memuat data. Silakan coba lagi.</p>
             </div>
 
-            <!-- Status Kosong -->
             <div id="empty" class="hide" style="text-align: center; padding: 40px; border: 3px dashed #111; background: #fff;">
                 <h3>No projects found.exe</h3>
                 <p>Belum ada proyek yang ditambahkan atau ditemukan.</p>
             </div>
 
-            <!-- Wadah Grid Project -->
             <div id="grid" class="projects-grid hide"></div>
 
         </div>
