@@ -519,3 +519,34 @@ body, html {
     background: #ffffff;
     font-family: inherit;
 }
+
+.retro-tooltip-container {
+    position: relative;
+    display: inline-block;
+}
+
+.retro-tooltip-container .tooltip-text {
+    visibility: hidden;
+    width: max-content;
+    background-color: #ffffe1;
+    color: #000000;
+    text-align: center;
+    border: 1px solid #000000;
+    padding: 3px 6px;
+    font-family: inherit;
+    font-size: 0.75rem;
+    position: absolute;
+    z-index: 99;
+    bottom: 125%; 
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 2px 2px 0px #000000; 
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.retro-tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
