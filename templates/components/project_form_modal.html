@@ -1,0 +1,31 @@
+<div id="add-project-modal" class="project-form-modal" popover="auto" role="dialog" aria-modal="true" aria-labelledby="add-project-modal-title">
+    <button type="button" class="project-form-modal__backdrop" popovertarget="add-project-modal" popovertargetaction="hide" aria-label="Tutup form tambah proyek"></button>
+    
+    <div class="project-form-modal__content retro-window" style="width: 400px; max-width: 90vw;">
+        <div class="title-bar">
+            <div class="title-bar-text" id="add-project-modal-title">📝 add_project.exe</div>
+            <div class="title-bar-controls">
+                <button type="button" class="control-btn close-btn" popovertarget="add-project-modal" popovertargetaction="hide" aria-label="Tutup"></button>
+            </div>
+        </div>
+
+        <div class="window-body" style="padding: 15px;">
+            <form id="project-form" method="post" action="{% url 'main:create_project' %}" class="project-form">
+                {% csrf_token %}
+                {% for field in form %}
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label for="{{ field.id_for_label }}" style="font-weight: bold; display: block; margin-bottom: 5px;">{{ field.label }}</label>
+                        {{ field }}
+                        {% for error in field.errors %}
+                            <p class="form-error" style="color: red; margin: 0; font-size: 0.8rem;">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <div class="project-form-modal__actions" style="margin-top: 20px; text-align: right;">
+                    <button type="button" class="retro-btn" style="background: #c0c0c0;" popovertarget="add-project-modal" popovertargetaction="hide">Batal</button>
+                    <button type="submit" class="retro-btn" style="background: #000080; color: white;">Tambah Proyek</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
