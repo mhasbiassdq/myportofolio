@@ -32,5 +32,5 @@ urlpatterns = [
     path("education/add/", create_education, name="create_education"),
     path("education/<uuid:education_id>/delete/", delete_education, name="delete_education"),
     path("projects/add-ajax/", create_project_ajax, name="create_project_ajax"),
-    path('cetak-admin/', cetak_admin_pws, name='cetak_admin_pws'),
+    #path('cetak-admin/', cetak_admin_pws, name='cetak_admin_pws'),
 ]
