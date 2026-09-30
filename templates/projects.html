@@ -51,24 +51,29 @@
                 {% endif %}
             </div>
 
+            <!-- Form Pencarian AJAX -->
             <form id="project-search-form" class="project-search" style="margin-bottom: 20px; text-align: center;">
                 <input type="search" id="search-input" name="title" value="{{ title_query }}" placeholder="Cari nama project.exe..." style="padding: 5px; border: 2px solid #111;">
                 <button type="submit" class="retro-btn">Cari</button>
             </form>
 
+            <!-- Status Loading -->
             <div id="loading" class="hide" style="text-align: center; padding: 20px;">
                 <p>⏳ Memuat projects.exe...</p>
             </div>
 
+            <!-- Status Error -->
             <div id="error" class="hide" style="text-align: center; padding: 20px; color: red;">
                 <p>❌ Gagal memuat data. Silakan coba lagi.</p>
             </div>
 
+            <!-- Status Kosong -->
             <div id="empty" class="hide" style="text-align: center; padding: 40px; border: 3px dashed #111; background: #fff;">
                 <h3>No projects found.exe</h3>
                 <p>Belum ada proyek yang ditambahkan atau ditemukan.</p>
             </div>
 
+            <!-- Wadah Grid Project -->
             <div id="grid" class="projects-grid hide"></div>
 
         </div>
@@ -81,6 +86,7 @@
 
 <script>
 const BASE_PROJECTS_ENDPOINT = "{% url 'main:get_projects_json' %}";
+const CREATE_PROJECT_ENDPOINT = "{% url 'main:create_project_ajax' %}";
 const IS_AUTHENTICATED = "{{ user.is_authenticated|yesno:'true,false' }}" === "true";
 let projectsAbortController;
 
@@ -90,6 +96,7 @@ const emptyState = document.getElementById('empty');
 const gridContainer = document.getElementById('grid');
 const searchForm = document.getElementById('project-search-form');
 const searchInput = document.getElementById('search-input');
+const projectForm = document.getElementById('project-form');
 
 function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
     loadingState.classList.toggle('hide', !showLoading);
@@ -197,8 +204,68 @@ searchForm.addEventListener('submit', function(e) {
     fetchProjects(searchInput.value.trim());
 });
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+async function addProject(event) {
+    event.preventDefault();
+    
+    const submitButton = projectForm.querySelector('button[type="submit"]');
+    if (submitButton) submitButton.disabled = true;
+
+    try {
+        const response = await fetch(CREATE_PROJECT_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: new FormData(projectForm),
+        });
+
+        const result = await response.json().catch(() => ({}));
+
+        if (response.ok) {
+            projectForm.reset();
+            closeProjectModal();
+            showToast('Berhasil!', 'Proyek baru berhasil ditambahkan!', 'success');
+            fetchProjects(searchInput.value.trim());
+        } else {
+            let errorMsg = "Gagal menambahkan proyek.";
+            if (result.errors) {
+                const messages = Object.values(result.errors).flat().map(err => err.message);
+                errorMsg = messages.join(' ');
+            } else if (result.message) {
+                errorMsg = result.message;
+            }
+            showToast('Gagal', errorMsg, 'error');
+        }
+    } catch (error) {
+        console.error('Error adding project:', error);
+        showToast('Gagal', 'Tidak dapat terhubung ke server.', 'error');
+    } finally {
+        if (submitButton) submitButton.disabled = false;
+    }
+}
+
+if (projectForm) {
+    projectForm.addEventListener('submit', addProject);
+}
+
 function closeProjectModal() {
-    document.getElementById("add-project-modal").hidePopover();
+    const modal = document.getElementById("add-project-modal");
+    if (modal) modal.hidePopover();
 }
 
 fetchProjects(searchInput.value.trim());

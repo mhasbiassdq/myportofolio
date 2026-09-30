@@ -8,6 +8,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 from main.models import Experience, Project, Education
 from main.forms import ProjectForm, ExperienceForm, EducationForm
@@ -241,3 +242,22 @@ def logout_user(request):
     response = redirect("main:show_main")
     response.delete_cookie('last_login')
     return response
+
+@require_POST
+def create_project_ajax(request):
+    if not request.user.is_authenticated:
+        return JsonResponse(
+            {"message": "Anda harus login untuk menambahkan proyek."},
+            status=403,
+        )
+
+    form = ProjectForm(request.POST)
+    if form.is_valid():
+        project = form.save(commit=False)
+        project.save()
+        return JsonResponse({
+            "message": "Proyek baru berhasil ditambahkan!",
+            "pk": str(project.id)
+        }, status=201)
+    
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
