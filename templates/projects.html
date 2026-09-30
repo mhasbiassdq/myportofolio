@@ -51,24 +51,29 @@
                 {% endif %}
             </div>
 
+            <!-- Form Pencarian AJAX -->
             <form id="project-search-form" class="project-search" style="margin-bottom: 20px; text-align: center;">
                 <input type="search" id="search-input" name="title" value="{{ title_query }}" placeholder="Cari nama project.exe..." style="padding: 5px; border: 2px solid #111;">
                 <button type="submit" class="retro-btn">Cari</button>
             </form>
 
+            <!-- Status Loading -->
             <div id="loading" class="hide" style="text-align: center; padding: 20px;">
                 <p>⏳ Memuat projects.exe...</p>
             </div>
 
+            <!-- Status Error -->
             <div id="error" class="hide" style="text-align: center; padding: 20px; color: red;">
                 <p>❌ Gagal memuat data. Silakan coba lagi.</p>
             </div>
 
+            <!-- Status Kosong -->
             <div id="empty" class="hide" style="text-align: center; padding: 40px; border: 3px dashed #111; background: #fff;">
                 <h3>No projects found.exe</h3>
                 <p>Belum ada proyek yang ditambahkan atau ditemukan.</p>
             </div>
 
+            <!-- Wadah Grid Project -->
             <div id="grid" class="projects-grid hide"></div>
 
         </div>
@@ -116,6 +121,10 @@ function buildProjectCardElement(item) {
     const articleElement = document.createElement('div');
     articleElement.className = 'retro-card'; 
 
+    const imageHtml = project.thumbnail 
+        ? `<img src="${escapeHtml(project.thumbnail)}" alt="${escapeHtml(project.title)}" style="width:100%; max-height:150px; object-fit:cover; border:2px solid #111; margin-bottom:10px;">` 
+        : '';
+
     const deleteUrl = "{% url 'main:delete_project' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', projectId);
     const starUrl = "{% url 'main:toggle_star' '00000000-0000-0000-0000-000000000000' %}".replace('00000000-0000-0000-0000-000000000000', projectId);
 
@@ -137,9 +146,10 @@ function buildProjectCardElement(item) {
 
     const completeCardHtml = `
         <div class="card-header">
-            <span class="tag-label">${escapeHtml(project.tech_stack || 'Project')}</span>
+            <span class="tag-label">${escapeHtml(project.category || 'Project')}</span>
         </div>
         
+        ${imageHtml}
         <h3>${escapeHtml(project.title)}</h3>
         <div class="card-divider"></div>
         
