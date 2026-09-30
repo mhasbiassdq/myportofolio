@@ -1,0 +1,13 @@
+{% load static %}
+<div id="toast-component" class="toast-component toast-hidden retro-window" popover="manual">
+    <div class="title-bar" id="toast-header" style="padding: 2px 5px;">
+        <div class="title-bar-text" id="toast-title">Notifikasi.exe</div>
+        <div class="title-bar-controls">
+            <button class="control-btn close-btn" onclick="document.getElementById('toast-component').hidePopover()"></button>
+        </div>
+    </div>
+    <div class="window-body" style="padding: 15px;">
+        <p id="toast-message" class="toast-message" style="margin: 0; font-family: 'Space Grotesk', monospace;">Ini pesan default.</p>
+    </div>
+</div>
+<script src="{% static 'js/toast.js' %}"></script>
