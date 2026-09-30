@@ -264,7 +264,7 @@ def create_project_ajax(request):
 
 def cetak_admin_pws(request):
     if not User.objects.filter(username='admin_hasbi').exists():
-        User.objects.create_superuser('admin_hasbi', 'email@test.com', 'rahasia123')
-        return HttpResponse("Sukses, bosht! Akun Superuser 'admin_hasbi' berhasil dicetak di PWS.")
+        User.objects.create_superuser('mhasbiassdq', 'email@test.com', 'Bismillah15_')
+        return HttpResponse("Sukses, bosht! Akun Superuser 'mhasbiassdq' berhasil dicetak di PWS.")
     else:
-        return HttpResponse("Akun Superuser 'admin_hasbi' udah ada, langsung login aja.")
+        return HttpResponse("Akun Superuser 'mhasbiassdq' udah ada, langsung login aja.")
