@@ -51,29 +51,24 @@
                 {% endif %}
             </div>
 
-            <!-- Form Pencarian AJAX -->
             <form id="project-search-form" class="project-search" style="margin-bottom: 20px; text-align: center;">
                 <input type="search" id="search-input" name="title" value="{{ title_query }}" placeholder="Cari nama project.exe..." style="padding: 5px; border: 2px solid #111;">
                 <button type="submit" class="retro-btn">Cari</button>
             </form>
 
-            <!-- Status Loading -->
             <div id="loading" class="hide" style="text-align: center; padding: 20px;">
                 <p>⏳ Memuat projects.exe...</p>
             </div>
 
-            <!-- Status Error -->
             <div id="error" class="hide" style="text-align: center; padding: 20px; color: red;">
                 <p>❌ Gagal memuat data. Silakan coba lagi.</p>
             </div>
 
-            <!-- Status Kosong -->
             <div id="empty" class="hide" style="text-align: center; padding: 40px; border: 3px dashed #111; background: #fff;">
                 <h3>No projects found.exe</h3>
                 <p>Belum ada proyek yang ditambahkan atau ditemukan.</p>
             </div>
 
-            <!-- Wadah Grid Project -->
             <div id="grid" class="projects-grid hide"></div>
 
         </div>
@@ -97,6 +92,15 @@ const gridContainer = document.getElementById('grid');
 const searchForm = document.getElementById('project-search-form');
 const searchInput = document.getElementById('search-input');
 const projectForm = document.getElementById('project-form');
+
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
 
 function displayPageSection({ showLoading = false, showError = false, showEmpty = false, showGrid = false }) {
     loadingState.classList.toggle('hide', !showLoading);
@@ -125,7 +129,7 @@ function buildProjectCardElement(item) {
     const starBtnHtml = IS_AUTHENTICATED 
         ? `<form action="${starUrl}" method="POST" style="display:inline; width: 100%;">
             {% csrf_token %}
-            <button type="submit" class="retro-btn btn-small" style="width: 100%; background: #fff;" title="${project.star_count > 0 ? 'Dibintangi oleh ' + project.starred_by_names : 'Beri star!'}">
+            <button type="submit" class="retro-btn btn-small" style="width: 100%; background: #fff;" title="${project.star_count > 0 ? 'Dibintangi oleh ' + escapeHtml(project.starred_by_names) : 'Beri star!'}">
                 ${project.is_starred ? '★ Unstar' : '☆ Star'} (${project.star_count})
             </button>
            </form>` 
@@ -133,13 +137,13 @@ function buildProjectCardElement(item) {
 
     const completeCardHtml = `
         <div class="card-header">
-            <span class="tag-label">${project.tech_stack || 'Project'}</span>
+            <span class="tag-label">${escapeHtml(project.tech_stack || 'Project')}</span>
         </div>
         
-        <h3>${project.title}</h3>
+        <h3>${escapeHtml(project.title)}</h3>
         <div class="card-divider"></div>
         
-        <p class="card-desc">${project.description}</p>
+        <p class="card-desc">${escapeHtml(project.description)}</p>
         
         <div class="card-footer">
             <span>⭐ ${project.star_count} Stars</span>
