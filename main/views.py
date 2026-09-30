@@ -9,6 +9,7 @@ from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.contrib.auth.models import User
 
 from main.models import Experience, Project, Education
 from main.forms import ProjectForm, ExperienceForm, EducationForm
@@ -260,3 +261,10 @@ def create_project_ajax(request):
         }, status=201)
     
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+
+def cetak_admin_pws(request):
+    if not User.objects.filter(username='admin_hasbi').exists():
+        User.objects.create_superuser('admin_hasbi', 'email@test.com', 'rahasia123')
+        return HttpResponse("Sukses, bosht! Akun Superuser 'admin_hasbi' berhasil dicetak di PWS.")
+    else:
+        return HttpResponse("Akun Superuser 'admin_hasbi' udah ada, langsung login aja.")
