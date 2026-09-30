@@ -39,7 +39,7 @@
                 <h1 class="retro-title" style="font-size: 3rem;">ACADEMIC JOURNEY</h1>
                 <p style="font-weight: bold;">(catatan perjalanan akademik)</p>
                 
-                {% if request.user.is_superuser %}
+                {% if user.is_authenticated %}
                     <div style="margin-top: 20px;">
                         <a href="{% url 'main:create_education' %}" class="retro-btn bg-pink">📌 Add New Sticky Note</a>
                     </div>

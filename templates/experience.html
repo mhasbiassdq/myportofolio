@@ -62,7 +62,7 @@
                             <h3 class="folder-title">{{ exp.title }}</h3>
                             <p class="folder-desc">{{ exp.description|truncatechars:50 }}</p>
 
-                            {% if request.user.is_superuser %}
+                            {% if user.is_authenticated %}
                                 <div class="folder-actions">
                                     <a href="{% url 'main:edit_experience' exp.id %}" class="retro-btn btn-small" style="background:#fff; color:#111; font-size: 0.7rem; padding: 4px 8px;">✏️ Edit</a>
                                     <form action="{% url 'main:delete_experience' exp.id %}" method="POST" style="display:inline;">
