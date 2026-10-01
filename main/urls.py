@@ -4,7 +4,7 @@ from main.views import (
     create_project, get_projects_json, delete_project,
     create_experience, edit_experience, delete_experience, get_experience_json, 
     register, login_user, logout_user, toggle_star,
-    show_education, create_education, delete_education, create_project_ajax, cetak_admin_pws
+    show_education, create_education, delete_education, create_project_ajax,
 )
 
 app_name = "main"
