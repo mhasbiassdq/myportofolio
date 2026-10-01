@@ -39,7 +39,7 @@
                 <h1 class="retro-title" style="font-size: 3rem;">ACADEMIC JOURNEY</h1>
                 <p style="font-weight: bold;">(My Life's Journey)</p>
                 
-                {% if user.is_authenticated %}
+                {% if user.is_superuser %}
                     <div style="margin-top: 20px;">
                         <a href="{% url 'main:create_education' %}" class="retro-btn bg-pink">📌 Add New Sticky Note</a>
                     </div>
@@ -62,7 +62,7 @@
                             <span>⏳ {{ edu.start_year }} - {{ edu.end_year }}</span>
                         </div>
 
-                        {% if user.is_authenticated %}
+                        {% if user.is_superuser %}
                             <form action="{% url 'main:delete_education' edu.id %}" method="POST" style="margin-top: 15px;">
                                 {% csrf_token %}
                                 <button type="submit" class="retro-btn btn-small" style="background:#ff0000; color:#fff; width: 100%;">🗑 Buang Catatan</button>

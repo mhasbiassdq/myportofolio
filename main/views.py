@@ -3,7 +3,7 @@ import datetime
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
@@ -56,6 +56,9 @@ def show_experience(request):
 
 @login_required(login_url="/login/")
 def edit_experience(request, experience_id):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Akses ditolak! Hanya superuser yang dapat mengedit pengalaman.")
+        
     experience = get_object_or_404(Experience, pk=experience_id)
     form = ExperienceForm(request.POST or None, instance=experience)
     
@@ -74,6 +77,9 @@ def edit_experience(request, experience_id):
 
 @login_required(login_url="/login/")
 def delete_experience(request, experience_id):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Akses ditolak! Hanya superuser yang dapat menghapus pengalaman.")
+        
     experience = get_object_or_404(Experience, pk=experience_id)
     if request.method == "POST":
         experience.delete()
@@ -85,6 +91,9 @@ def delete_experience(request, experience_id):
 
 @login_required(login_url="/login/")
 def create_experience(request):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Akses ditolak! Hanya superuser yang dapat menambah pengalaman.")
+        
     form = ExperienceForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -131,7 +140,7 @@ def show_projects(request):
     title_query = request.GET.get("title", "").strip()
     
     context = {
-        "name": "Muhammad Hasbi Assiddiq", # Ganti pakai namalu
+        "name": "Muhammad Hasbi Assiddiq",
         "title_query": title_query,
         "form": ProjectForm(),
     }
@@ -140,6 +149,9 @@ def show_projects(request):
 
 @login_required(login_url="/login/")
 def delete_project(request, project_id):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Akses ditolak! Hanya superuser yang dapat menghapus proyek.")
+        
     project = get_object_or_404(Project, pk=project_id)
     if request.method == "POST":
         project.delete()
@@ -151,6 +163,9 @@ def delete_project(request, project_id):
 
 @login_required(login_url="/login/")
 def create_project(request):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Akses ditolak! Hanya superuser yang dapat menambah proyek.")
+        
     form = ProjectForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -185,6 +200,9 @@ def show_education(request):
 
 @login_required(login_url="/login/")
 def create_education(request):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Akses ditolak! Hanya superuser yang dapat menambah riwayat pendidikan.")
+        
     form = EducationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
         form.save()
@@ -200,6 +218,9 @@ def create_education(request):
 
 @login_required(login_url="/login/")
 def delete_education(request, education_id):
+    if not request.user.is_superuser:
+        return HttpResponseForbidden("Akses ditolak! Hanya superuser yang dapat menghapus riwayat pendidikan.")
+        
     education = get_object_or_404(Education, pk=education_id)
     if request.method == "POST":
         education.delete()
@@ -245,9 +266,9 @@ def logout_user(request):
 
 @require_POST
 def create_project_ajax(request):
-    if not request.user.is_authenticated:
+    if not request.user.is_superuser:
         return JsonResponse(
-            {"message": "Anda harus login untuk menambahkan proyek."},
+            {"message": "Akses ditolak! Hanya superuser yang dapat menambahkan proyek."},
             status=403,
         )
 
@@ -261,10 +282,3 @@ def create_project_ajax(request):
         }, status=201)
     
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
-
-def cetak_admin_pws(request):
-    if not User.objects.filter(username='admin_hasbi').exists():
-        User.objects.create_superuser('mhasbiassdq', 'email@test.com', 'Bismillah15_')
-        return HttpResponse("Sukses, bosht! Akun Superuser 'mhasbiassdq' berhasil dicetak di PWS.")
-    else:
-        return HttpResponse("Akun Superuser 'mhasbiassdq' udah ada, langsung login aja.")
