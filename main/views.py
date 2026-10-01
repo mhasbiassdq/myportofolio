@@ -107,6 +107,7 @@ def create_experience(request):
     }
     return render(request, "experience_form.html", context)
 
+
 def get_projects_json(request):
     title_query = request.GET.get("title", "").strip()
     projects = Project.objects.prefetch_related('starred_by').all()
@@ -189,6 +190,7 @@ def toggle_star(request, project_id):
             project.starred_by.add(request.user)
     return redirect("main:show_projects")
 
+
 def show_education(request):
     educations = Education.objects.all().order_by('-start_year')
     context = {
@@ -228,6 +230,7 @@ def delete_education(request, education_id):
         return redirect("main:show_education")
     return redirect("main:show_education")
 
+
 def register(request):
     form = UserCreationForm(request.POST or None)
     if request.method == "POST" and form.is_valid():
@@ -263,6 +266,7 @@ def logout_user(request):
     response = redirect("main:show_main")
     response.delete_cookie('last_login')
     return response
+
 
 @require_POST
 def create_project_ajax(request):
