@@ -43,38 +43,17 @@ class ProjectForm(ModelForm):
 class ExperienceForm(ModelForm):
     class Meta:
         model = Experience
-        fields = ["title", "description", "category", "thumbnail"]
-        
-        labels = {
-            "title": "Posisi / Peran",
-            "description": "Deskripsi Pengalaman",
-            "category": "Kategori Pengalaman",
-            "thumbnail": "URL Logo / Gambar",
-        }
-        
-        widgets = {
-            "title": TextInput(attrs={
-                "placeholder": "Contoh: Ketua BEM / Data Science Intern", 
-                "maxlength": 255
-            }),
-            "description": Textarea(attrs={
-                "placeholder": "Ceritakan pengalaman dan tanggung jawabmu...", 
-                "rows": 3
-            }),
-            "category": Select(),
-            "thumbnail": URLInput(attrs={
-                "placeholder": "https://url-gambar-kamu.com"
-            }),
-        }
+        fields = ["title", "description", "category"] 
 
+    # Membersihkan data 'title' dari tag HTML berbahaya
     def clean_title(self):
-        title = strip_tags(self.cleaned_data['title']).strip()
-        if not title:
-            raise ValidationError("Posisi atau peran tidak boleh hanya berisi tag HTML.")
-        return title
+        title = self.cleaned_data["title"]
+        return strip_tags(title)
 
+    # Membersihkan data 'description' dari tag HTML berbahaya
     def clean_description(self):
-        return strip_tags(self.cleaned_data['description']).strip()
+        description = self.cleaned_data["description"]
+        return strip_tags(description)
 
 class EducationForm(forms.ModelForm):
     class Meta:

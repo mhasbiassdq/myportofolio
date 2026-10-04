@@ -286,3 +286,25 @@ def create_project_ajax(request):
         }, status=201)
     
     return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
+
+@require_POST
+def create_experience_ajax(request):
+    # Cek hak akses, pastiin cuma superuser mhasbiassdq yang bisa nambah!
+    if not request.user.is_superuser:
+        return JsonResponse(
+            {"message": "Akses ditolak! Cuma superuser yang boleh nambah pengalaman."},
+            status=403,
+        )
+
+    form = ExperienceForm(request.POST)
+    # Validasi form dan balas pakai JSON
+    if form.is_valid():
+        experience = form.save(commit=False)
+        experience.save()
+        return JsonResponse({
+            "message": "Pengalaman baru berhasil ditambah nih bos!",
+            "pk": str(experience.id)
+        }, status=201) # 201 artinya Created / Sukses dibuat
+
+    # Kalau gagal validasi (misal input kosong)
+    return JsonResponse({"errors": form.errors.get_json_data()}, status=400)
