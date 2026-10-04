@@ -87,7 +87,7 @@
 </div>
 {% endif %}
 
-<!-- LOGIKA JAVASCRIPT AJAX & DEBOUNCE -->
+<!-- LOGIKA JAVASCRIPT AJAX, DEBOUNCE, & TOAST -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
     // --- 1. INISIALISASI VARIABEL ---
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const fields = exp.fields;
             const pk = exp.pk;
             
-            // XSS Protection via JS DOM: gunakan textContent untuk teks aman
+            // XSS Protection via JS DOM
             // Menentukan kategori tulisan (mapping manual)
             let categoryText = "Lainnya";
             if(fields.category === "ORG") categoryText = "Organisasi";
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(openBtn) openBtn.addEventListener('click', () => modal.style.display = 'flex');
     if(cancelBtn) cancelBtn.addEventListener('click', () => modal.style.display = 'none');
 
-    // --- 6. SUBMIT FORM VIA AJAX POST ---
+    // --- 6. SUBMIT FORM VIA AJAX POST & TOAST NOTIFICATION ---
     if(form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault(); // Cegah reload halaman
@@ -240,14 +240,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     modal.style.display = 'none';
                     form.reset();
                     fetchExperiences(searchInput.value); 
+                    
+                    // Panggil Toast Sukses dari toast.js bawaan tutorial
+                    if (typeof showToast === "function") {
+                        showToast("✅ Mantap! Pengalaman berhasil ditambahkan.");
+                    } else {
+                        alert("✅ Mantap! Pengalaman berhasil ditambahkan.");
+                    }
                 } else {
                     const errData = await response.json();
-                    alert("Error menyimpan data: Cek kembali form kamu.");
+                    
+                    // Panggil Toast Error
+                    if (typeof showToast === "function") {
+                        showToast("⚠️ Error: Gagal menyimpan data, periksa kembali form lu.");
+                    } else {
+                        alert("⚠️ Error: Gagal menyimpan data, periksa kembali form lu.");
+                    }
                     console.error(errData.errors);
                 }
             } catch(error) {
                 console.error("Fetch Error:", error);
-                alert("Koneksi bermasalah!");
+                
+                if (typeof showToast === "function") {
+                    showToast("🚨 Koneksi bermasalah!");
+                } else {
+                    alert("🚨 Koneksi bermasalah!");
+                }
             }
         });
     }
