@@ -87,4 +87,173 @@
 </div>
 {% endif %}
 
+<!-- LOGIKA JAVASCRIPT AJAX & DEBOUNCE -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // --- 1. INISIALISASI VARIABEL ---
+    const container = document.getElementById('experience-container');
+    const searchInput = document.getElementById('search-input');
+    const modal = document.getElementById('experience-modal');
+    const openBtn = document.getElementById('open-modal-btn');
+    const cancelBtn = document.getElementById('cancel-modal-btn');
+    const form = document.getElementById('experience-form');
+    
+    // Status apakah user adalah superuser (dikirim dari Django ke JS)
+    const isSuperuser = {{ user.is_superuser|yesno:"true,false" }};
+    
+    // Variabel penampung timer untuk Debouncing
+    let debounceTimer;
+
+    // --- 2. FUNGSI FETCH DATA (AJAX GET) ---
+    async function fetchExperiences(query = '') {
+        // Tampilkan status Loading saat data sedang diambil
+        container.innerHTML = `
+            <div style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <h3 style="animation: blink 1s linear infinite;">⏳ Sedang mengambil data folder.exe...</h3>
+            </div>
+        `;
+        
+        try {
+            // Panggil API JSON (bisa dengan atau tanpa query parameter)
+            const url = query ? `{% url 'main:get_experience_json' %}?title=${encodeURIComponent(query)}` : `{% url 'main:get_experience_json' %}`;
+            const response = await fetch(url);
+            
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const data = await response.json();
+            renderExperiences(data);
+        } catch (error) {
+            // Tampilkan error jika API gagal dipanggil
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; border: 3px dashed #ff0000; background: #fff; color: #ff0000;">
+                    <h3>⚠️ SYSTEM ERROR: Gagal memuat data!</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        }
+    }
+
+    // --- 3. FUNGSI RENDER KE HTML DOM ---
+    function renderExperiences(experiences) {
+        container.innerHTML = ''; // Bersihkan kontainer
+        
+        // Kondisi jika data kosong
+        if (experiences.length === 0) {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 40px; border: 3px dashed #111; background: #fff;">
+                    <h3>No folder found.exe</h3>
+                    <p>Pencarian atau data kosong.</p>
+                </div>
+            `;
+            return;
+        }
+
+        // Looping data dan buat elemen HTML
+        experiences.forEach(exp => {
+            const fields = exp.fields;
+            const pk = exp.pk;
+            
+            // XSS Protection via JS DOM: gunakan textContent untuk teks aman
+            // Menentukan kategori tulisan (mapping manual)
+            let categoryText = "Lainnya";
+            if(fields.category === "ORG") categoryText = "Organisasi";
+            if(fields.category === "WORK") categoryText = "Pekerjaan";
+            if(fields.category === "VOL") categoryText = "Volunteer";
+
+            // Batasi panjang teks (Truncatechars versi JS)
+            const descTruncated = fields.description.length > 50 ? fields.description.substring(0, 50) + "..." : fields.description;
+            const titleTruncated = fields.title.length > 20 ? fields.title.substring(0, 20) + "..." : fields.title;
+
+            // Template folder Y2K
+            const folderHTML = `
+                <div class="folder-wrapper">
+                    <div class="retro-folder">
+                        <div class="folder-paper">
+                            <span style="font-weight: bold; font-size: 0.8rem;">📄 ${escapeHTML(categoryText)}</span>
+                        </div>
+                        <h3 class="folder-title">${escapeHTML(fields.title)}</h3>
+                        <p class="folder-desc">${escapeHTML(descTruncated)}</p>
+
+                        ${isSuperuser ? `
+                            <div class="folder-actions">
+                                <a href="/experience/${pk}/edit/" class="retro-btn btn-small" style="background:#fff; color:#111; font-size: 0.7rem; padding: 4px 8px;">✏️ Edit</a>
+                                <form action="/experience/${pk}/delete/" method="POST" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="retro-btn btn-small" style="background:#ff0000; color:#fff; font-size: 0.7rem; padding: 4px 8px;">🗑</button>
+                                </form>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="folder-label">
+                        📥 ${escapeHTML(titleTruncated)}
+                    </div>
+                </div>
+            `;
+            container.innerHTML += folderHTML;
+        });
+    }
+
+    // Fungsi pembantu untuk XSS Protection manual di JS
+    function escapeHTML(str) {
+        return str.replace(/[&<>'"]/g, 
+            tag => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                "'": '&#39;',
+                '"': '&quot;'
+            }[tag] || tag)
+        );
+    }
+
+    // --- 4. FITUR DEBOUNCING PADA SEARCH ---
+    if(searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer); // Batalkan timer sebelumnya
+            
+            // Pasang timer baru, tunggu 500ms setelah ngetik terakhir
+            debounceTimer = setTimeout(() => {
+                fetchExperiences(e.target.value);
+            }, 500);
+        });
+    }
+
+    // --- 5. LOGIKA BUKA-TUTUP MODAL ---
+    if(openBtn) openBtn.addEventListener('click', () => modal.style.display = 'flex');
+    if(cancelBtn) cancelBtn.addEventListener('click', () => modal.style.display = 'none');
+
+    // --- 6. SUBMIT FORM VIA AJAX POST ---
+    if(form) {
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Cegah reload halaman
+            
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch("{% url 'main:create_experience_ajax' %}", {
+                    method: 'POST',
+                    body: formData, // CSRF token sudah otomatis kebawa dari form HTML
+                });
+                
+                if (response.ok) {
+                    // Jika sukses: Tutup modal, reset form, reload data
+                    modal.style.display = 'none';
+                    form.reset();
+                    fetchExperiences(searchInput.value); 
+                } else {
+                    const errData = await response.json();
+                    alert("Error menyimpan data: Cek kembali form kamu.");
+                    console.error(errData.errors);
+                }
+            } catch(error) {
+                console.error("Fetch Error:", error);
+                alert("Koneksi bermasalah!");
+            }
+        });
+    }
+
+    // --- 7. LOAD DATA PERTAMA KALI SAAT HALAMAN DIBUKA ---
+    fetchExperiences();
+});
+</script>
 {% endblock content %}
