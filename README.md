@@ -77,3 +77,38 @@ Saya menggunakan AI secara bertahap (*step-by-step*). Setiap kali menemui *error
 Walaupun sangat membantu, kode dari AI jarang bisa langsung di-*copy-paste* 100%. Ada beberapa penyesuaian manual yang harus saya lakukan:
 * AI sering tidak tahu struktur letak file HTML saya, jadi saya harus menyesuaikan sendiri lokasi penempatan *template tag* agar tampilan web tidak berantakan.
 * Sesekali ada karakter yang berlebih dari jawaban AI (seperti kelebihan tanda kurung), sehingga saya tetap harus melakukan *debugging* dan membaca ulang logika kodenya untuk memperbaiki *syntax error*.
+
+### Tugas 5
+
+### Jawaban Pertanyaan Reflektif
+
+**1. Jelaskan apa itu *debouncing* dan mengapa teknik ini penting diterapkan pada fitur pencarian yang menggunakan AJAX!**
+*Debouncing* adalah pola pemrograman (*design pattern*) yang digunakan untuk membatasi laju eksekusi sebuah fungsi, dengan cara memberikan jeda waktu (misalnya 500ms) setelah *event* terakhir kali dipicu. Pada fitur pencarian AJAX, teknik ini sangat esensial karena tanpa *debouncing*, *event listener* akan menembakkan *request* HTTP ke server pada setiap ketikan *keystroke*. Jika pengguna mengetik kata "Universitas", browser akan mengirim 11 *request* secara beruntun dalam hitungan milidetik. Hal ini sangat memboroskan *bandwidth*, menurunkan performa UX (karena *UI freezing*), dan berisiko memicu *bottleneck* atau *overload* pada *server*. Dengan *debouncing*, fungsi `fetch()` hanya akan dieksekusi satu kali setelah pengguna benar-benar berhenti mengetik, memastikan penggunaan *resource* yang optimal.
+
+**2. Jelaskan fungsi dari penggunaan `await` ketika kita menggunakan `fetch()`. Apa yang akan terjadi jika kita tidak menggunakan `await`?**
+Dalam eksekusi program *asynchronous*, `fetch()` mengembalikan sebuah *Promise* (janji bahwa data akan dikembalikan di masa depan, entah berhasil atau gagal), bukan data aktual secara instan. Kata kunci `await` berfungsi untuk memberi tahu *JavaScript engine* agar menjeda eksekusi kode pada baris tersebut dan menunggu hingga *Promise* dari `fetch()` berstatus *resolved* (selesai mengambil data dari jaringan). 
+Jika kita mengabaikan `await`, JavaScript yang bersifat *non-blocking* akan langsung mengeksekusi baris kode berikutnya seketika. Akibatnya, saat program mencoba memanipulasi atau merender variabel hasil `fetch()` ke dalam DOM HTML, variabel tersebut masih berstatus *Pending Promise* atau *undefined*. Hal ini akan memicu *Runtime Error* dan membuat antarmuka gagal menampilkan data JSON yang diharapkan.
+
+**3. Jelaskan apa itu serangan XSS (*Cross-Site Scripting*) dan mengapa data yang ditampilkan melalui AJAX/JavaScript lebih rentan terhadap serangan ini daripada data yang ditampilkan langsung melalui template Django!**
+XSS (*Cross-Site Scripting*) adalah kerentanan keamanan aplikasi web di mana peretas (hacker) berhasil mengeksekusi skrip berbahaya (biasanya JavaScript) di dalam *browser* pengguna lain dengan cara menyisipkannya ke dalam basis data atau URL. 
+Data yang dirender menggunakan AJAX/JavaScript (seperti menetapkan *string* ke `innerHTML`) sangat rentan karena *browser* akan membaca dan mengeksekusi *string* tersebut sebagai elemen HTML atau skrip secara mentah. Jika data mengandung payload seperti `<img src="x" onerror="alert('Hacked')">`, skrip tersebut akan langsung berjalan. Sebaliknya, *template engine* Django (`{{ variable }}`) memiliki mekanisme *auto-escaping* bawaan secara *default*. Fitur ini secara otomatis mengubah karakter-karakter khusus HTML menjadi entitas aman (contoh: `<` diubah menjadi `&lt;` dan `>` menjadi `&gt;`) sebelum dirender ke klien, sehingga *browser* hanya akan membacanya sebagai teks biasa, bukan instruksi yang dapat dieksekusi.
+
+
+### AI Disclosure & Analisis Kritis Pembelajaran
+
+Dalam penyelesaian Tugas 5 ini, saya menggunakan AI (Google Gemini) sebagai *pair-programmer*. Melalui proses ini, saya mengalami transisi pembelajaran yang signifikan dari ketergantungan pasif menuju pemanfaatan AI yang analitis, sesuai dengan prinsip *Reinforcement Sehat*.
+
+**1. Fase Awal: Terjebak dalam Pola "Reinforcement Pasif"**
+Pada awal pengerjaan, saya memposisikan AI murni sebagai **"Answer Machine"**. Saya menghindari usaha kognitif dengan langsung meminta *full code* untuk fitur AJAX dan menempelkannya (*copy-paste*) ke dalam *codebase* saya tanpa evaluasi struktural yang mendalam. Akibatnya, saya kehilangan konteks dari sistem yang saya bangun sendiri.
+
+**2. Titik Balik (TRY & THINK): Keterbatasan Konteks AI pada Error 500**
+Pendekatan pasif tersebut terbukti gagal total ketika aplikasi saya mengalami *Internal Server Error (500)*. AI, yang hanya melihat potongan kode *views* dan *template* yang saya berikan, salah mendiagnosis masalah dan terus merekomendasikan perbaikan sintaksis pada `views.py`. Karena AI tidak memiliki akses absolut (*blind spot*) terhadap keseluruhan proyek, saya terpaksa harus menghentikan ketergantungan tersebut dan mulai membedah masalah secara mandiri (Fase *Try & Think*). Saya menjalankan server lokal, menelusuri *traceback* di terminal, dan menemukan bahwa akar masalahnya adalah *dangling import* (`ImportError` fungsi `cetak_admin_pws`) yang tertinggal di `urls.py` dari Tugas 4. 
+
+**3. Transisi ke "Learning Coach" & Perbaikan Manual (REVISE & LEARN)**
+Setelah menyadari batasan AI, saya mengubah pola *prompting* saya. Alih-alih meminta kode instan, saya meminta petunjuk (*hint*), evaluasi logika, dan penjelasan konsep (Fase *Revise & Learn*). Berikut adalah integrasi dan perbaikan manual tingkat lanjut yang saya lakukan setelah berdiskusi dengan AI:
+*   **Restrukturisasi UI/UX (DOM Mapping):** Logika *render* HTML DOM yang dihasilkan AI awalnya menggunakan struktur div generik yang merusak desain. Saya secara manual membedah variabel JSON tersebut dan memetakannya kembali ke dalam arsitektur kelas CSS `retro-window`, `title-bar`, dan sistem *grid* tema Y2K portofolio saya untuk memastikan konsistensi antarmuka.
+*   **Layer Keamanan XSS Ganda:** AI menyarankan fungsi manipulasi Regex `escapeHTML` di sisi *client/JavaScript*. Setelah mempelajari fungsinya, saya memutuskan untuk menerapkan pertahanan ganda, yaitu membersihkan *input* di sisi *backend* menggunakan `strip_tags` pada *ModelForm* Django, sekaligus melakukan *escaping* di sisi *frontend* saat *rendering* AJAX.
+*   **Integrasi Toast Dinamis:** Saya menolak menggunakan *default* `alert()` browser dari *output* mentah AI, dan memodifikasi *Promise resolver* pada `fetch()` untuk memicu komponen `showToast()` dari tutorial sebelumnya agar interaksi pengguna jauh lebih profesional.
+
+**Kesimpulan:**
+Tugas ini menyadarkan saya bahwa jika AI hanya digunakan untuk memberi jawaban tercepat, saya tidak benar-benar belajar, melainkan hanya mahir dalam merangkai pertanyaan (prompt). Memposisikan AI sebagai *Learning Coach* untuk berdiskusi, memberikan *hint*, dan memberikan umpan balik atas *trial-and-error* mandiri adalah metode paling efektif untuk membangun pemahaman yang solid.
