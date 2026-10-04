@@ -41,15 +41,9 @@ def get_experience_json(request):
 
 
 def show_experience(request):
-    json_response = get_experience_json(request)
-    experiences_deserialized = serializers.deserialize("json", json_response.content.decode("utf-8"))
-    experiences = [exp.object for exp in experiences_deserialized]
-    title_query = request.GET.get("title", "").strip()
-
     context = {
         "name": "Muhammad Hasbi Assiddiq",
-        "experience_list": experiences,
-        "title_query": title_query,
+        "form": ExperienceForm(), 
     }
     return render(request, "experience.html", context)
 
