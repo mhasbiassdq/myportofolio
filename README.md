@@ -112,3 +112,41 @@ Setelah menyadari batasan AI, saya mengubah pola *prompting* saya. Alih-alih mem
 
 **Kesimpulan:**
 Tugas ini menyadarkan saya bahwa jika AI hanya digunakan untuk memberi jawaban tercepat, saya tidak benar-benar belajar, melainkan hanya mahir dalam merangkai pertanyaan (prompt). Memposisikan AI sebagai *Learning Coach* untuk berdiskusi, memberikan *hint*, dan memberikan umpan balik atas *trial-and-error* mandiri adalah metode paling efektif untuk membangun pemahaman yang solid.
+
+### Tugas 6
+
+#### Jawaban Pertanyaan Reflektif
+
+**1. Jelaskan apa yang dimaksud dengan REST dan mengapa mengembalikan JSON saja belum cukup untuk menyebut sebuah API sebagai RESTful! Jelaskan pula perbedaan PUT dan PATCH.**
+REST (Representational State Transfer) adalah gaya arsitektur untuk merancang API yang berorientasi pada *resource*. Mengembalikan JSON saja belum cukup karena REST mewajibkan penggunaan standar HTTP secara penuh: menggunakan metode HTTP yang tepat secara semantik (GET untuk membaca, POST untuk membuat), menggunakan HTTP Status Codes standar (200 OK, 201 Created, 404 Not Found), serta bersifat *stateless*.
+*Perbedaan:* `PUT` digunakan untuk mengganti seluruh data objek (seluruh *field* harus dikirim ulang secara utuh), sedangkan `PATCH` digunakan untuk *partial update* atau memperbarui sebagian *field* saja tanpa menghapus atau mengubah *field* yang tidak disertakan dalam *request*.
+
+**2. Jelaskan peran serializer pada Django REST Framework! Apa keuntungannya dibanding merakit dictionary manual seperti di Tutorial 05?**
+Peran utama *serializer* adalah menjembatani konversi data kompleks (seperti *instance* Model Django atau QuerySet) menjadi format *native* Python (seperti list/dict) agar mudah di-*render* menjadi JSON, serta sebaliknya (dari JSON divalidasi kembali menjadi Model). 
+*Keuntungan:* Mengeliminasi kode repetitif, mencegah eksploitasi data melalui validasi *built-in* (seperti `strip_tags` untuk mencegah XSS), meng-handle relasi *Many-To-Many* (seperti fitur *star*) secara otomatis tanpa penulisan *query* manual yang rumit, dan dapat diintegrasikan langsung dengan *auto-generated schema* untuk dokumentasi API (seperti Swagger).
+
+**3. Jelaskan perbedaan autentikasi dan otorisasi pada DRF! Mengapa hak akses harus diperiksa dengan permission class di server, bukan hanya menyembunyikan tombol di template?**
+- **Autentikasi (Authentication):** Proses verifikasi identitas (Menjawab pertanyaan: "Siapa pengguna ini?").
+- **Otorisasi (Authorization/Permission):** Proses penentuan hak akses (Menjawab pertanyaan: "Apa yang boleh dilakukan oleh pengguna ini?").
+Menyembunyikan tombol (*UI Hiding*) di *template frontend* bukanlah fitur keamanan, melainkan sekadar manipulasi tampilan. Jika peretas mengetahui *endpoint* API (misalnya `/api/v1/projects/1/`), mereka dapat mem-bypass antarmuka web dan menembakkan *request* DELETE secara langsung melalui antarmuka baris perintah (cURL) atau aplikasi Postman. *Permission class* di level *server* memastikan perlindungan arsitektural mutlak di mana *request* terlarang akan langsung diblokir (403 Forbidden) sebelum sistem menyentuh basis data.
+
+**4. Jelaskan mengapa permintaan yang mengubah data tetap memerlukan token CSRF ketika API memakai SessionAuthentication! Mengapa test yang memakai force_authenticate tidak cukup untuk membuktikan bahwa perlindungan CSRF berjalan?**
+`SessionAuthentication` mengandalkan *cookies* sesi yang tersimpan di dalam *browser*. Saat ada skrip atau *request* berbahaya dari situs web eksternal (serangan Cross-Site), *browser* secara otomatis akan melampirkan *cookies* tersebut karena mengira permintaan itu sah. Token CSRF mutlak diperlukan sebagai lapisan validasi sekunder yang memverifikasi bahwa *request* tersebut diinisiasi secara sadar dari *form* atau *script* internal di dalam aplikasi kita sendiri.
+Penggunaan metode `force_authenticate` di dalam kelas *unit test* akan menyuntikkan objek `User` secara langsung ke dalam objek `request`, sehingga memotong (*bypass*) seluruh lapisan *middleware* Django, termasuk *CSRF Middleware*. Untuk memvalidasi bahwa proteksi CSRF benar-benar aktif dalam pengujian, kita harus mensimulasikan *environment* klien yang ketat menggunakan `APIClient(enforce_csrf_checks=True)` yang dipadukan dengan pemanggilan fungsi `.login()`.
+
+---
+
+#### AI Disclosure & Analisis Kritis Pembelajaran
+Dalam pengerjaan Tugas 6 ini, saya kembali memposisikan AI (Google Gemini) sebagai *Pair-Programmer* dan *Learning Coach*, mempertahankan prinsip *Reinforcement Sehat* dari tugas sebelumnya.
+
+**1. Diskusi Konseptual & Eksplorasi Arsitektur (Fase Try & Think)**
+Saya menggunakan AI untuk memahami transisi paradigma dari arsitektur konvensional (tradisional) menuju *Single Page Application* (SPA) yang digerakkan oleh RESTful API. AI sangat membantu dalam menjelaskan perbedaan konseptual antara mekanisme `SessionAuthentication` bawaan Django dengan autentikasi berbasis Token mandiri, serta mengurai urgensi pengiriman *Header* `X-CSRFToken` saat mengeksekusi metode `fetch()` di JavaScript.
+
+**2. Keterbatasan AI pada Spesifikasi Rubrik & Routing Kompleks**
+Kode awal yang disarankan AI untuk kelas *Serializer* dan *Views* bersifat terlalu generik. AI menyarankan penggunaan integer standar untuk *Primary Key* dan penggunaan sintaks `__all__` pada parameter meta *fields*. AI tidak mengenali batasan spesifik rubrik tugas yang secara ketat melarang `__all__` dan mewajibkan struktur UUID. Selain itu, saat merancang *Custom Permission*, AI awalnya hanya memberikan skema otorisasi biner (Admin vs Umum), mengabaikan instruksi hierarki 4 lapis (Pengunjung, Pengguna Biasa, Editor, dan Pemilik/Superuser) yang menjadi prasyarat penilaian.
+
+**3. Perbaikan Manual & Integrasi Sistem (Fase Revise & Learn)**
+Menyadari *blind spot* AI terhadap spesifikasi proyek dan arsitektur model basis data saya, saya turun tangan melakukan perombakan serta integrasi manual secara menyeluruh:
+- **Custom Permissions yang Dinamis:** Saya secara mandiri merancang kelas `IsPortfolioOwnerOrEditorOrReadOnly` di dalam `permissions.py` yang memvalidasi *queryset* `request.user.groups` untuk memisahkan peran spesifik grup 'Editor', memastikan keamanan *Object-Level* dan *View-Level* berjalan sinkron.
+- **UUID Path Converter:** Saya merevisi struktur *routing* di dalam `api_urls.py` dari bentuk umum `<int:id>` menjadi `<uuid:id>` agar tidak terjadi *server crash* dengan arsitektur model basis data `Project` saya yang sudah dikonfigurasi menggunakan tipe data UUID sejak Tugas 2.
+- **Optimasi DOM Event Delegation:** Daripada mengikuti instruksi naif AI yang mengikat *event listener* pada setiap tombol *Star* dan *Delete* secara individual (yang sangat rentan memicu *memory leak* dan *bug* statis saat DOM dirender ulang secara asinkron), saya merombak struktur tersebut dan mengimplementasikan arsitektur *Event Delegation* pada *container* `<div id="grid">` utama. Logika ini memastikan seluruh interaksi tombol *Delete* dan *Star* tetap sangat responsif dan berkinerja stabil terlepas dari frekuensi manipulasi elemen oleh modul AJAX.
