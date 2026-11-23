@@ -36,7 +36,6 @@ SECRET_KEY = 'django-insecure-=xh2*&(-=db=yx@yshlf7f7*hyf5s20=9c%a84jo373+mfqz_!
 DEBUG = True
 
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -46,11 +45,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',  # <-- DRF ditambahkan di sini
+    'corsheaders',
+    'rest_framework',
+    'rest_framework.authtoken',
     'main',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -84,7 +86,6 @@ WSGI_APPLICATION = 'portofolio.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Database configuration
 if PRODUCTION:
     DATABASES = {
         'default': {
@@ -153,3 +154,14 @@ WHITENOISE_USE_FINDERS = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CSRF_TRUSTED_ORIGINS = ["https://muhammad-hasbi52-myportofolio.pws.cs.ui.ac.id"]
+
+# Django REST Framework configuration
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
+}
+
+# Local development CORS settings for Flutter Web (Chrome)
+CORS_ALLOW_ALL_ORIGINS = True
