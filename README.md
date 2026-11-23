@@ -150,3 +150,60 @@ Menyadari *blind spot* AI terhadap spesifikasi proyek dan arsitektur model basis
 - **Custom Permissions yang Dinamis:** Saya secara mandiri merancang kelas `IsPortfolioOwnerOrEditorOrReadOnly` di dalam `permissions.py` yang memvalidasi *queryset* `request.user.groups` untuk memisahkan peran spesifik grup 'Editor', memastikan keamanan *Object-Level* dan *View-Level* berjalan sinkron.
 - **UUID Path Converter:** Saya merevisi struktur *routing* di dalam `api_urls.py` dari bentuk umum `<int:id>` menjadi `<uuid:id>` agar tidak terjadi *server crash* dengan arsitektur model basis data `Project` saya yang sudah dikonfigurasi menggunakan tipe data UUID sejak Tugas 2.
 - **Optimasi DOM Event Delegation:** Daripada mengikuti instruksi naif AI yang mengikat *event listener* pada setiap tombol *Star* dan *Delete* secara individual (yang sangat rentan memicu *memory leak* dan *bug* statis saat DOM dirender ulang secara asinkron), saya merombak struktur tersebut dan mengimplementasikan arsitektur *Event Delegation* pada *container* `<div id="grid">` utama. Logika ini memastikan seluruh interaksi tombol *Delete* dan *Star* tetap sangat responsif dan berkinerja stabil terlepas dari frekuensi manipulasi elemen oleh modul AJAX.
+
+# MyPortfolio Mobile (PBP - Individual Assignment 7)
+**Nama:** Muhammad Hasbi Assiddiq  
+**NPM:** 2506624360  
+**Kelas:** PBP A  
+
+---
+
+## 📝 Jawaban Pertanyaan Reflektif
+
+**1. Jelaskan apa yang dimaksud dengan *widget tree* pada Flutter dan bagaimana hubungan induk-anak (*parent-child*) bekerja antar-*widget*!**
+*Widget tree* adalah struktur hierarkis dari elemen-elemen antarmuka (UI) dalam aplikasi Flutter, di mana setiap komponen UI adalah sebuah widget. Hubungan *parent-child* bekerja dengan cara widget induk (*parent*) membungkus dan mengontrol tata letak serta mewariskan *state* atau *context* kepada widget anaknya (*child* atau *children*). Contohnya, `Scaffold` sebagai induk memberikan struktur dasar layar yang diisi oleh `AppBar` dan `Column` sebagai anak-anaknya.
+
+**2. Sebutkan semua *widget* yang kamu gunakan dalam proyek ini dan jelaskan fungsinya masing-masing!**
+- `MaterialApp`: Root widget untuk mengatur tema dasar dan navigasi aplikasi ala Material Design.
+- `Scaffold`: Menyediakan struktur visual dasar halaman (menampung AppBar dan Body).
+- `AppBar`: Bilah navigasi di bagian atas layar.
+- `SingleChildScrollView`: Membuat *layout* bisa di-*scroll* jika konten melebihi batas layar.
+- `Column` & `Row`: Menyusun widget anak secara vertikal (`Column`) atau horizontal (`Row`).
+- `Padding`: Memberikan jarak kosong (margin/padding) di sekitar widget anaknya.
+- `Card`: Wadah dengan efek bayangan (elevasi) dan sudut membulat.
+- `Container`: Kotak fleksibel untuk membungkus widget lain dengan properti padding, ukuran, dan dekorasi.
+- `GridView`: Menyusun deretan widget (tombol aksi) ke dalam format *grid* (kolom dan baris).
+- `Material`: Mengaplikasikan efek visual Material (seperti warna latar) pada tombol.
+- `InkWell`: Membuat area bisa diklik/disentuh dan memberikan efek visual *ripple* saat ditekan.
+- `Text`: Menampilkan string teks dengan kustomisasi gaya (`TextStyle`).
+- `Icon`: Menampilkan grafis vektor standar Material.
+- `SizedBox`: Memberikan spasi/jarak kosong statis antar widget.
+- `SnackBar`: Memunculkan pesan pop-up sementara di bawah layar setelah *event* klik.
+
+**3. Apa fungsi dari *widget* `MaterialApp`? Jelaskan mengapa *widget* ini umumnya digunakan sebagai *root widget* pada aplikasi Flutter!**
+`MaterialApp` berfungsi membungkus sejumlah widget yang umum dibutuhkan oleh aplikasi dengan gaya Material Design. Ia digunakan sebagai *root widget* karena secara otomatis mengonfigurasi *routing* halaman (navigator), tema global aplikasi (warna dan tipografi), serta pengaturan lokalisasi, sehingga developer tidak perlu mengonfigurasinya secara manual dari nol.
+
+**4. Jelaskan perbedaan antara `StatelessWidget` dan `StatefulWidget`! Kapan kita sebaiknya memilih yang satu dibandingkan yang lain?**
+- `StatelessWidget`: Widget statis yang tampilannya tidak akan berubah setelah dirender. Digunakan untuk UI konstan seperti teks statis, ikon, atau kartu informasi dasar yang datanya tidak bermutasi (seperti profil).
+- `StatefulWidget`: Widget dinamis yang memiliki *state* internal. Digunakan ketika UI perlu di-*re-render* atau berubah bentuk akibat interaksi user atau *update* data, seperti form input, *counter* angka, atau daftar yang mengambil data dari API.
+
+**5. Apa itu `BuildContext` dan mengapa penting di Flutter? Bagaimana penggunaannya di dalam metode `build`?**
+`BuildContext` adalah referensi atau "handle" yang menunjukkan posisi sebuah widget di dalam *widget tree*. Ini sangat penting karena memungkinkan sebuah widget berinteraksi dengan induk atau lingkungannya. Di dalam metode `build`, `context` digunakan untuk mengakses tema aplikasi (`Theme.of(context)`), ukuran layar (`MediaQuery.of(context)`), atau memunculkan elemen pop-up dari Scaffold induknya (`ScaffoldMessenger.of(context)`).
+
+**6. Jelaskan konsep *hot reload* di Flutter dan apa perbedaannya dengan *hot restart*! Kapan kita tidak bisa hanya mengandalkan *hot reload* dan harus melakukan *hot restart* atau *full restart*?**
+- *Hot Reload*: Menyuntikkan perubahan kode sumber langsung ke dalam Dart Virtual Machine tanpa menghancurkan *state* saat ini. Sangat cepat dan cocok untuk mengubah UI (seperti warna atau teks).
+- *Hot Restart*: Mereset *state* secara penuh dan mengompilasi ulang kode, mengembalikan aplikasi ke kondisi awal layar. Diperlukan ketika kita mengubah struktur dasar navigasi, mengubah nama kelas statis, menambahkan *assets* baru, atau mengubah logika di `initState()`.
+
+---
+
+## 🤖 AI Disclosure & Analisis Kritis Pembelajaran
+**Tools:** Google Gemini  
+
+**Strategi Prompting:** 
+Saya menggunakan AI sebagai *pair-programmer* untuk mendiskusikan arsitektur kode, struktur UI, dan efisiensi implementasi. Prompt yang saya gunakan berfokus pada pemecahan masalah secara konseptual, contohnya: 
+- *"Bagaimana cara menerapkan warna yang dinamis dan modular pada tiap item `GridView` di Flutter tanpa menggunakan percabangan `if-else` yang repetitif?"*
+- *"Berikan praktik terbaik (*best practice*) penerapan `ScaffoldMessenger` untuk memunculkan `SnackBar` saat `InkWell` ditekan pada sebuah `StatelessWidget`."*
+- *"Bagaimana cara menstrukturkan komentar docstring yang tepat pada komponen kartu *reusable* di Flutter?"*
+
+**Keterbatasan & Perbaikan Manual:** 
+AI sangat membantu dalam memberikan kerangka (*boilerplate*) awal dan ide penyelesaian masalah spesifik. Namun, kode yang dihasilkan AI seringkali kurang presisi terhadap aturan linter bawaan Dart (misalnya penempatan *keyword* `const` yang redundan atau terlewat). Oleh karena itu, saya harus melakukan penyesuaian manual pada *widget tree*, mengintegrasikan data statis profil saya, dan secara ketat menjalankan perintah `flutter analyze` untuk memastikan arsitektur kode bersih dan bebas dari *warning* (*No issues found*).
